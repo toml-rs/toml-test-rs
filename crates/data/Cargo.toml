@@ -1,0 +1,7 @@
+[package]
+name = "toml-test-data"
+version = "1.0.0"
+edition = "2018"
+
+[dependencies]
+include_dir = "0.6"
