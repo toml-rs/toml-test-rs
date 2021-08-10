@@ -7,8 +7,12 @@ pub enum Encoded {
 }
 
 impl Encoded {
-    pub fn from_slice(v: &[u8]) -> Result<Self, serde_json::Error> {
-        serde_json::from_slice(v)
+    pub fn from_slice(v: &[u8]) -> Result<Self, crate::Error> {
+        serde_json::from_slice(v).map_err(|e| crate::Error::new(e.to_string()))
+    }
+
+    pub fn to_string_pretty(&self) -> Result<String, crate::Error> {
+        serde_json::to_string_pretty(self).map_err(|e| crate::Error::new(e.to_string()))
     }
 }
 
