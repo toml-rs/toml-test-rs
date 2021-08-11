@@ -14,7 +14,7 @@ pub fn encoder_in() -> Result<encoded::Encoded, Error> {
     encoded::Encoded::from_slice(&buf)
 }
 
-pub fn decoder_output(e: encoded::Encoded) -> Result<(), Error> {
+pub fn decoder_out(e: encoded::Encoded) -> Result<(), Error> {
     let s = e.to_string_pretty()?;
     std::io::stdout()
         .write_all(s.as_bytes())
