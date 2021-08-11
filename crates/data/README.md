@@ -1,6 +1,6 @@
-# toml-test-rs
+# toml-test-data
 
-> **Verify Rust TOML parsers**
+> **TOML test cases**
 
 [![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][Documentation]
 ![License](https://img.shields.io/crates/l/toml-test.svg)
@@ -11,7 +11,6 @@ Dual-licensed under [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE)
 ## About
 
 [toml-test](https://github.com/BurntSushi/toml-test) is a language-agnostic
-toml parser spec verification.  This crate aims to streamline using
-`toml-tests` on Rust crates.
+toml parser spec verification.  This crate distributes all of the test cases.
 
 [Documentation]: https://docs.rs/toml-test
