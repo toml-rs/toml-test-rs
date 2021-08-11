@@ -15,21 +15,21 @@ fn run() -> proc_exit::ExitResult {
     let matches = Matches::new(args.ignore.iter().map(|s| s.as_str()))
         .with_code(proc_exit::Code::USAGE_ERR)?;
     for bin in args.bin.iter() {
+        let bin = toml_test::verify::Command::new(bin);
         if args.encoder {
-            verify_encoder(bin.as_path(), &matches)?;
+            unimplemented!("Not yet implemented, waiting on a verified decoder");
         } else {
-            verify_decoder(bin.as_path(), &matches)?;
+            verify_decoder(&bin, &matches)?;
         }
     }
 
     Ok(())
 }
 
-fn verify_encoder(_bin: &std::path::Path, _matches: &Matches) -> proc_exit::ExitResult {
-    unimplemented!("Not yet implemented");
-}
-
-fn verify_decoder(bin: &std::path::Path, matches: &Matches) -> proc_exit::ExitResult {
+fn verify_decoder(
+    bin: &dyn toml_test::verify::Decoder,
+    matches: &Matches,
+) -> proc_exit::ExitResult {
     let mut passed = 0;
     let mut failed = 0;
 
@@ -38,26 +38,9 @@ fn verify_decoder(bin: &std::path::Path, matches: &Matches) -> proc_exit::ExitRe
             log::debug!("Skipped {}", case.name.display());
             continue;
         }
-        match run_decoder(bin, case.fixture) {
-            Ok(actual) => {
-                let expected = toml_test::encoded::Encoded::from_slice(&case.expected)
-                    .with_code(proc_exit::Code::USAGE_ERR)?;
-                if actual == expected {
-                    passed += 1;
-                } else {
-                    log::debug!("{}: failed", case.name.display());
-                    log::trace!(
-                        "{}: expected\n{}",
-                        case.name.display(),
-                        expected.to_string_pretty().unwrap()
-                    );
-                    log::trace!(
-                        "{}: actual\n{}",
-                        case.name.display(),
-                        actual.to_string_pretty().unwrap()
-                    );
-                    failed += 1;
-                }
+        match bin.verify_valid_case(case.fixture, case.expected) {
+            Ok(()) => {
+                passed += 1;
             }
             Err(err) => {
                 log::debug!("{}: failed", case.name.display());
@@ -72,20 +55,16 @@ fn verify_decoder(bin: &std::path::Path, matches: &Matches) -> proc_exit::ExitRe
             log::debug!("Skipped {}", case.name.display());
             continue;
         }
-        match run_decoder(bin, case.fixture) {
-            Ok(actual) => {
-                log::debug!("{}: should have failed", case.name.display());
-                log::trace!(
-                    "{}: actual\n{}",
-                    case.name.display(),
-                    actual.to_string_pretty().unwrap()
-                );
-                failed += 1;
-            }
-            Err(err) => {
+        match bin.verify_invalid_case(case.fixture) {
+            Ok(err) => {
                 log::debug!("{}: failed successfully", case.name.display());
                 log::trace!("{}: {}", case.name.display(), err);
                 passed += 1;
+            }
+            Err(err) => {
+                log::debug!("{}: should have failed", case.name.display());
+                log::trace!("{}: {}", case.name.display(), err);
+                failed += 1;
             }
         }
     }
@@ -93,7 +72,7 @@ fn verify_decoder(bin: &std::path::Path, matches: &Matches) -> proc_exit::ExitRe
     let _ = writeln!(
         std::io::stdout(),
         "toml-test [{}]: using embedded tests: {} passed, {} failed",
-        bin.file_name().unwrap().to_string_lossy(),
+        bin.name(),
         passed,
         failed
     );
@@ -102,32 +81,6 @@ fn verify_decoder(bin: &std::path::Path, matches: &Matches) -> proc_exit::ExitRe
     }
 
     Ok(())
-}
-
-fn run_decoder(
-    bin: &std::path::Path,
-    toml: &[u8],
-) -> Result<toml_test::encoded::Encoded, eyre::Error> {
-    let mut cmd = std::process::Command::new(bin);
-    cmd.stdin(std::process::Stdio::piped())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped());
-    let child = cmd.spawn()?;
-    child.stdin.as_ref().unwrap().write_all(toml)?;
-
-    let output = child.wait_with_output()?;
-    if output.status.success() {
-        let output = toml_test::encoded::Encoded::from_slice(&output.stdout)?;
-        Ok(output)
-    } else {
-        let message = String::from_utf8_lossy(&output.stderr);
-        eyre::bail!(
-            "{} failed with {:?}: {}",
-            bin.display(),
-            output.status.code(),
-            message
-        )
-    }
 }
 
 fn init_logging(mut level: clap_verbosity_flag::Verbosity) {

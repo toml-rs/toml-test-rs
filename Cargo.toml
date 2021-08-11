@@ -2,6 +2,7 @@
 members = [
     "crates/data",
     "crates/cli",
+    "crates/harness",
 ]
 
 [package]
