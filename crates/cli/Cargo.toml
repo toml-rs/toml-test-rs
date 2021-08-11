@@ -1,0 +1,19 @@
+[package]
+name = "toml-test-cli"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+name = "toml-test"
+path = "src/main.rs"
+
+[dependencies]
+toml-test-data = { version = "1.0", path = "../data" }
+toml-test = { version = "0.1", path = "../../" }
+structopt = "0.3"
+proc-exit = "1"
+ignore = "0.4"
+eyre = "0.6"
+log = "0.4"
+clap-verbosity-flag = "0.3"
+env_logger = { version = "0.9", default-features = false, features = ["termcolor"] }
