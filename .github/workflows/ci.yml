@@ -15,6 +15,13 @@ on:
     - '!/docs/**'
     - "!/LICENSE-*"
 jobs:
+  ci:
+    name: CI
+    needs: [smoke, test, msrv, docs, rustfmt, clippy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Done
+        run: exit 0
   smoke:
     name: Quick Check
     runs-on: ubuntu-latest
@@ -53,10 +60,6 @@ jobs:
         profile: minimal
         override: true
     - uses: Swatinem/rust-cache@v1
-    - name: Configure git
-      run: |
-        git config --global user.name "Test User"
-        git config --global user.email "test_user@example.com"
     - name: Default features
       run: cargo test --workspace
     - name: All features
