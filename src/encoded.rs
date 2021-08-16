@@ -8,11 +8,11 @@ pub enum Encoded {
 
 impl Encoded {
     pub fn from_slice(v: &[u8]) -> Result<Self, crate::Error> {
-        serde_json::from_slice(v).map_err(|e| crate::Error::new(e))
+        serde_json::from_slice(v).map_err(crate::Error::new)
     }
 
     pub fn to_string_pretty(&self) -> Result<String, crate::Error> {
-        serde_json::to_string_pretty(self).map_err(|e| crate::Error::new(e))
+        serde_json::to_string_pretty(self).map_err(crate::Error::new)
     }
 }
 

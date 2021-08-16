@@ -110,9 +110,9 @@ impl Matches {
         for line in patterns {
             ignores
                 .add_line(None, line)
-                .map_err(|e| toml_test::Error::new(e))?;
+                .map_err(toml_test::Error::new)?;
         }
-        let ignores = ignores.build().map_err(|e| toml_test::Error::new(e))?;
+        let ignores = ignores.build().map_err(toml_test::Error::new)?;
         Ok(Self { ignores })
     }
 
