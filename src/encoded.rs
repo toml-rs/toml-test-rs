@@ -17,45 +17,55 @@ impl Encoded {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub struct EncodedValue {
-    #[serde(rename = "type")]
-    toml_type: EncodedValueType,
-    value: String,
+#[serde(rename_all = "kebab-case")]
+#[serde(tag = "type", content = "value")]
+pub enum EncodedValue {
+    String(String),
+    Integer(String),
+    Float(String),
+    Bool(String),
+    Datetime(String),
+    DatetimeLocal(String),
+    DateLocal(String),
+    TimeLocal(String),
+}
+
+impl EncodedValue {
+    pub fn as_str(&self) -> &str {
+        match self {
+            EncodedValue::String(v)
+            | EncodedValue::Integer(v)
+            | EncodedValue::Float(v)
+            | EncodedValue::Bool(v)
+            | EncodedValue::Datetime(v)
+            | EncodedValue::DatetimeLocal(v)
+            | EncodedValue::DateLocal(v)
+            | EncodedValue::TimeLocal(v) => v.as_str(),
+        }
+    }
 }
 
 impl<'a> From<&'a str> for EncodedValue {
     fn from(other: &'a str) -> Self {
-        Self {
-            toml_type: EncodedValueType::String,
-            value: other.to_owned(),
-        }
+        EncodedValue::String(other.to_owned())
+    }
+}
+
+impl<'a> From<&'a String> for EncodedValue {
+    fn from(other: &'a String) -> Self {
+        EncodedValue::String(other.clone())
     }
 }
 
 impl From<String> for EncodedValue {
     fn from(other: String) -> Self {
-        Self {
-            toml_type: EncodedValueType::String,
-            value: other,
-        }
+        EncodedValue::String(other)
     }
 }
 
 impl From<i64> for EncodedValue {
     fn from(other: i64) -> Self {
-        Self {
-            toml_type: EncodedValueType::Integer,
-            value: other.to_string(),
-        }
-    }
-}
-
-impl From<bool> for EncodedValue {
-    fn from(other: bool) -> Self {
-        Self {
-            toml_type: EncodedValueType::Integer,
-            value: other.to_string(),
-        }
+        EncodedValue::Integer(other.to_string())
     }
 }
 
@@ -68,22 +78,12 @@ impl From<f64> for EncodedValue {
         } else {
             s.to_owned()
         };
-        Self {
-            toml_type: EncodedValueType::Integer,
-            value: s,
-        }
+        EncodedValue::Float(s)
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum EncodedValueType {
-    String,
-    Integer,
-    Float,
-    Bool,
-    Datetime,
-    DatetimeLocal,
-    DateLocal,
-    TimeLocal,
+impl From<bool> for EncodedValue {
+    fn from(other: bool) -> Self {
+        EncodedValue::Bool(other.to_string())
+    }
 }
