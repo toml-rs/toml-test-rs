@@ -71,12 +71,20 @@ impl From<i64> for EncodedValue {
 
 impl From<f64> for EncodedValue {
     fn from(other: f64) -> Self {
-        let s = format!("{:.15}", other);
-        let s = s.trim_end_matches('0');
-        let s = if s.ends_with('.') {
-            format!("{}0", s)
+        let s = if other.is_nan() {
+            "nan".to_owned()
+        } else if other.is_infinite() && other.is_sign_negative() {
+            "-inf".to_owned()
+        } else if other.is_infinite() && other.is_sign_positive() {
+            "inf".to_owned()
         } else {
-            s.to_owned()
+            let s = format!("{:.15}", other);
+            let s = s.trim_end_matches('0');
+            if s.ends_with('.') {
+                format!("{}0", s)
+            } else {
+                s.to_owned()
+            }
         };
         EncodedValue::Float(s)
     }
