@@ -107,7 +107,11 @@ impl PartialEq for EncodedValue {
                     true
                 } else if s == "+inf" && o == "inf" {
                     true
+                } else if s == "nan" && o == "nan" {
+                    true
                 } else {
+                    let s = s.parse::<f64>().unwrap();
+                    let o = o.parse::<f64>().unwrap();
                     s == o
                 }
             }
@@ -178,6 +182,31 @@ mod test {
             EncodedValue::Float("+inf".to_owned())
         );
         assert_ne!(EncodedValue::from(f64::INFINITY), EncodedValue::from("inf"));
+    }
+
+    #[test]
+    fn float_exp_equality() {
+        assert_eq!(EncodedValue::from(3.0e14), EncodedValue::from(3.0e14));
+        assert_eq!(
+            EncodedValue::from(3.0e14),
+            EncodedValue::Float("3.0e14".to_owned())
+        );
+    }
+
+    #[test]
+    fn float_binary_equality() {
+        #![allow(clippy::excessive_precision)]
+
+        // These cases are equivalent, just wanting to call out how Rust, at times, encodes the
+        // number in a string.
+        assert_eq!(
+            EncodedValue::from(3141.5927),
+            EncodedValue::Float("3141.5927".to_owned())
+        );
+        assert_eq!(
+            EncodedValue::from(3141.59270000000015),
+            EncodedValue::Float("3141.5927".to_owned())
+        );
     }
 
     #[test]
