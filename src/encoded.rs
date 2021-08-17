@@ -16,7 +16,7 @@ impl Encoded {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 #[serde(tag = "type", content = "value")]
 pub enum EncodedValue {
@@ -93,5 +93,117 @@ impl From<f64> for EncodedValue {
 impl From<bool> for EncodedValue {
     fn from(other: bool) -> Self {
         EncodedValue::Bool(other.to_string())
+    }
+}
+
+impl PartialEq for EncodedValue {
+    fn eq(&self, other: &Self) -> bool {
+        #[allow(clippy::if_same_then_else)]
+        match (self, other) {
+            (EncodedValue::String(s), EncodedValue::String(o)) => s == o,
+            (EncodedValue::Integer(s), EncodedValue::Integer(o)) => s == o,
+            (EncodedValue::Float(s), EncodedValue::Float(o)) => {
+                if s == "inf" && o == "+inf" {
+                    true
+                } else if s == "+inf" && o == "inf" {
+                    true
+                } else {
+                    s == o
+                }
+            }
+            (EncodedValue::Bool(s), EncodedValue::Bool(o)) => s == o,
+            (EncodedValue::Datetime(s), EncodedValue::Datetime(o)) => s == o,
+            (EncodedValue::DatetimeLocal(s), EncodedValue::DatetimeLocal(o)) => s == o,
+            (EncodedValue::DateLocal(s), EncodedValue::DateLocal(o)) => s == o,
+            (EncodedValue::TimeLocal(s), EncodedValue::TimeLocal(o)) => s == o,
+            (_, _) => false,
+        }
+    }
+}
+
+impl Eq for EncodedValue {}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn string_equality() {
+        assert_eq!(EncodedValue::from("foo"), EncodedValue::from("foo"));
+        assert_ne!(EncodedValue::from("foo"), EncodedValue::from("bar"));
+        assert_ne!(EncodedValue::from("42"), EncodedValue::from(42));
+        assert_ne!(EncodedValue::from("true"), EncodedValue::from(true));
+    }
+
+    #[test]
+    fn integer_equality() {
+        assert_eq!(EncodedValue::from(42), EncodedValue::from(42));
+        assert_ne!(EncodedValue::from(42), EncodedValue::from(21));
+        assert_ne!(EncodedValue::from(42), EncodedValue::from("42"));
+    }
+
+    #[test]
+    fn float_equality() {
+        assert_eq!(EncodedValue::from(42.0), EncodedValue::from(42.0));
+        assert_ne!(EncodedValue::from(42.0), EncodedValue::from(21.0));
+        assert_ne!(EncodedValue::from(42.0), EncodedValue::from("42.0"));
+    }
+
+    #[test]
+    fn nan_equality() {
+        assert_eq!(EncodedValue::from(f64::NAN), EncodedValue::from(f64::NAN));
+        assert_eq!(
+            EncodedValue::from(f64::NAN),
+            EncodedValue::Float("nan".to_owned())
+        );
+        assert_ne!(EncodedValue::from(f64::NAN), EncodedValue::from("nan"));
+    }
+
+    #[test]
+    fn inf_equality() {
+        assert_eq!(
+            EncodedValue::from(f64::INFINITY),
+            EncodedValue::from(f64::INFINITY)
+        );
+        assert_ne!(
+            EncodedValue::from(f64::INFINITY),
+            EncodedValue::from(f64::NEG_INFINITY)
+        );
+        assert_eq!(
+            EncodedValue::from(f64::INFINITY),
+            EncodedValue::Float("inf".to_owned())
+        );
+        assert_eq!(
+            EncodedValue::from(f64::INFINITY),
+            EncodedValue::Float("+inf".to_owned())
+        );
+        assert_ne!(EncodedValue::from(f64::INFINITY), EncodedValue::from("inf"));
+    }
+
+    #[test]
+    fn neg_inf_equality() {
+        assert_eq!(
+            EncodedValue::from(f64::NEG_INFINITY),
+            EncodedValue::from(f64::NEG_INFINITY)
+        );
+        assert_ne!(
+            EncodedValue::from(f64::NEG_INFINITY),
+            EncodedValue::from(f64::INFINITY)
+        );
+        assert_eq!(
+            EncodedValue::from(f64::NEG_INFINITY),
+            EncodedValue::Float("-inf".to_owned())
+        );
+        assert_ne!(
+            EncodedValue::from(f64::NEG_INFINITY),
+            EncodedValue::from("-inf")
+        );
+    }
+
+    #[test]
+    fn bool_equality() {
+        assert_eq!(EncodedValue::from(true), EncodedValue::from(true));
+        assert_ne!(EncodedValue::from(true), EncodedValue::from(false));
+        assert_ne!(EncodedValue::from(true), EncodedValue::from("true"));
     }
 }
