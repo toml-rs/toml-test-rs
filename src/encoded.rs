@@ -116,13 +116,48 @@ impl PartialEq for EncodedValue {
                 }
             }
             (EncodedValue::Bool(s), EncodedValue::Bool(o)) => s == o,
-            (EncodedValue::Datetime(s), EncodedValue::Datetime(o)) => s == o,
-            (EncodedValue::DatetimeLocal(s), EncodedValue::DatetimeLocal(o)) => s == o,
-            (EncodedValue::DateLocal(s), EncodedValue::DateLocal(o)) => s == o,
-            (EncodedValue::TimeLocal(s), EncodedValue::TimeLocal(o)) => s == o,
+            (EncodedValue::Datetime(s), EncodedValue::Datetime(o)) => {
+                parse_date_time(s) == parse_date_time(o)
+            }
+            (EncodedValue::DatetimeLocal(s), EncodedValue::DatetimeLocal(o)) => {
+                parse_date_time_local(s) == parse_date_time_local(o)
+            }
+            (EncodedValue::DateLocal(s), EncodedValue::DateLocal(o)) => {
+                parse_date_local(s) == parse_date_local(o)
+            }
+            (EncodedValue::TimeLocal(s), EncodedValue::TimeLocal(o)) => {
+                parse_time_local(s) == parse_time_local(o)
+            }
             (_, _) => false,
         }
     }
+}
+
+fn parse_date_time(s: &str) -> chrono::DateTime<chrono::FixedOffset> {
+    normalize_datetime(s).parse().unwrap()
+}
+
+fn parse_date_time_local(s: &str) -> chrono::NaiveDateTime {
+    normalize_datetime(s).parse().unwrap()
+}
+
+fn parse_date_local(s: &str) -> chrono::NaiveDate {
+    s.parse().unwrap()
+}
+
+fn parse_time_local(s: &str) -> chrono::NaiveTime {
+    s.parse().unwrap()
+}
+
+fn normalize_datetime(s: &str) -> String {
+    s.chars()
+        .map(|c| match c {
+            ' ' => 'T',
+            't' => 'T',
+            'z' => 'Z',
+            _ => c,
+        })
+        .collect()
 }
 
 impl Eq for EncodedValue {}
@@ -234,5 +269,89 @@ mod test {
         assert_eq!(EncodedValue::from(true), EncodedValue::from(true));
         assert_ne!(EncodedValue::from(true), EncodedValue::from(false));
         assert_ne!(EncodedValue::from(true), EncodedValue::from("true"));
+    }
+
+    #[test]
+    fn datetime_equality() {
+        assert_eq!(
+            EncodedValue::Datetime("1987-07-05 17:45:00Z".to_owned()),
+            EncodedValue::Datetime("1987-07-05 17:45:00Z".to_owned())
+        );
+        assert_eq!(
+            EncodedValue::Datetime("1987-07-05T17:45:56.123456Z".to_owned()),
+            EncodedValue::Datetime("1987-07-05T17:45:56.123456Z".to_owned()),
+        );
+        assert_ne!(
+            EncodedValue::Datetime("1987-07-05 17:45:00Z".to_owned()),
+            EncodedValue::Datetime("2000-07-05 17:45:00Z".to_owned())
+        );
+        assert_eq!(
+            EncodedValue::Datetime("1987-07-05t17:45:00z".to_owned()),
+            EncodedValue::Datetime("1987-07-05 17:45:00Z".to_owned())
+        );
+        assert_ne!(
+            EncodedValue::Datetime("1987-07-05 17:45:00Z".to_owned()),
+            EncodedValue::from("1987-07-05 17:45:00Z")
+        );
+    }
+
+    #[test]
+    fn datetime_local_equality() {
+        assert_eq!(
+            EncodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
+            EncodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned())
+        );
+        assert_eq!(
+            EncodedValue::DatetimeLocal("1987-07-05 17:45:00.444".to_owned()),
+            EncodedValue::DatetimeLocal("1987-07-05 17:45:00.444".to_owned())
+        );
+        assert_ne!(
+            EncodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
+            EncodedValue::DatetimeLocal("2000-07-05 17:45:00".to_owned())
+        );
+        assert_eq!(
+            EncodedValue::DatetimeLocal("1987-07-05t17:45:00".to_owned()),
+            EncodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned())
+        );
+        assert_ne!(
+            EncodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
+            EncodedValue::from("1987-07-05 17:45:00")
+        );
+    }
+
+    #[test]
+    fn date_local_equality() {
+        assert_eq!(
+            EncodedValue::DateLocal("1987-07-05".to_owned()),
+            EncodedValue::DateLocal("1987-07-05".to_owned())
+        );
+        assert_ne!(
+            EncodedValue::DateLocal("1987-07-05".to_owned()),
+            EncodedValue::DateLocal("2000-07-05".to_owned())
+        );
+        assert_ne!(
+            EncodedValue::DateLocal("1987-07-05".to_owned()),
+            EncodedValue::from("1987-07-05")
+        );
+    }
+
+    #[test]
+    fn time_local_equality() {
+        assert_eq!(
+            EncodedValue::TimeLocal("17:45:00".to_owned()),
+            EncodedValue::TimeLocal("17:45:00".to_owned())
+        );
+        assert_eq!(
+            EncodedValue::TimeLocal("17:45:00.444".to_owned()),
+            EncodedValue::TimeLocal("17:45:00.444".to_owned())
+        );
+        assert_ne!(
+            EncodedValue::TimeLocal("17:45:00".to_owned()),
+            EncodedValue::TimeLocal("19:45:00".to_owned())
+        );
+        assert_ne!(
+            EncodedValue::TimeLocal("17:45:00".to_owned()),
+            EncodedValue::from("17:45:00")
+        );
     }
 }
