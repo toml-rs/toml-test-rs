@@ -29,6 +29,7 @@ pre-release-replacements = [
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+chrono = "0.4"
 
 [dev-dependencies]
 toml-test-data = { version = "1", path = "crates/data" }
