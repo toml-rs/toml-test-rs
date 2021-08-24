@@ -134,19 +134,31 @@ impl PartialEq for EncodedValue {
 }
 
 fn parse_date_time(s: &str) -> chrono::DateTime<chrono::FixedOffset> {
-    normalize_datetime(s).parse().unwrap()
+    match normalize_datetime(s).parse() {
+        Ok(d) => d,
+        Err(err) => panic!("Failed to parse {:?}: {}", s, err),
+    }
 }
 
 fn parse_date_time_local(s: &str) -> chrono::NaiveDateTime {
-    normalize_datetime(s).parse().unwrap()
+    match normalize_datetime(s).parse() {
+        Ok(d) => d,
+        Err(err) => panic!("Failed to parse {:?}: {}", s, err),
+    }
 }
 
 fn parse_date_local(s: &str) -> chrono::NaiveDate {
-    s.parse().unwrap()
+    match s.parse() {
+        Ok(d) => d,
+        Err(err) => panic!("Failed to parse {:?}: {}", s, err),
+    }
 }
 
 fn parse_time_local(s: &str) -> chrono::NaiveTime {
-    s.parse().unwrap()
+    match s.parse() {
+        Ok(d) => d,
+        Err(err) => panic!("Failed to parse {:?}: {}", s, err),
+    }
 }
 
 fn normalize_datetime(s: &str) -> String {
