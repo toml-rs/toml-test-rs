@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+- Improve panic message
+
 ## [0.2.4] - 2021-08-19
 
 ## [0.2.3] - 2021-08-17
