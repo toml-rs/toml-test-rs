@@ -6,7 +6,12 @@ pub trait Encoder {
     fn verify_valid_case(&self, decoded: &[u8], fixture: &dyn Decoder) -> Result<(), crate::Error> {
         let decoded_expected = crate::decoded::Decoded::from_slice(decoded)?;
         let actual = self.encode(decoded_expected.clone())?;
-        let decoded_actual = fixture.decode(actual.as_bytes())?;
+        let decoded_actual = fixture.decode(actual.as_bytes()).map_err(|err| {
+            crate::Error::new(format!(
+                "Could not parse encoded TOML: {}\n```\n{}\n```",
+                err, actual
+            ))
+        })?;
 
         if decoded_actual == decoded_expected {
             Ok(())
