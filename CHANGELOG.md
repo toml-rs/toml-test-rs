@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+#### Features
+
+- Encoder harness
+
 #### Breaking Changes
 
 - Fixed the naming of `Encoded` to `Decoded`

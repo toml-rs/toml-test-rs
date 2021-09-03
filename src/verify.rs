@@ -3,6 +3,22 @@ use std::io::Write;
 pub trait Encoder {
     fn encode(&self, data: crate::decoded::Decoded) -> Result<String, crate::Error>;
 
+    fn verify_valid_case(&self, decoded: &[u8], fixture: &dyn Decoder) -> Result<(), crate::Error> {
+        let decoded_expected = crate::decoded::Decoded::from_slice(decoded)?;
+        let actual = self.encode(decoded_expected.clone())?;
+        let decoded_actual = fixture.decode(actual.as_bytes())?;
+
+        if decoded_actual == decoded_expected {
+            Ok(())
+        } else {
+            Err(crate::Error::new(format!(
+                "Unexpected decoding.\nExpected\n{}\nActual\n{}",
+                decoded_expected.to_string_pretty().unwrap(),
+                decoded_actual.to_string_pretty().unwrap()
+            )))
+        }
+    }
+
     fn name(&self) -> &str;
 }
 
@@ -46,6 +62,42 @@ impl Command {
         Self {
             bin: path.as_ref().to_owned(),
         }
+    }
+}
+
+impl Encoder for Command {
+    fn encode(&self, data: crate::decoded::Decoded) -> Result<String, crate::Error> {
+        let data = data.to_string_pretty()?;
+
+        let mut cmd = std::process::Command::new(&self.bin);
+        cmd.stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped());
+        let child = cmd.spawn().map_err(crate::Error::new)?;
+        child
+            .stdin
+            .as_ref()
+            .unwrap()
+            .write_all(data.as_bytes())
+            .map_err(crate::Error::new)?;
+
+        let output = child.wait_with_output().map_err(crate::Error::new)?;
+        if output.status.success() {
+            let output = String::from_utf8(output.stdout).map_err(crate::Error::new)?;
+            Ok(output)
+        } else {
+            let message = String::from_utf8_lossy(&output.stderr);
+            Err(crate::Error::new(format!(
+                "{} failed with {:?}: {}",
+                self.bin.display(),
+                output.status.code(),
+                message
+            )))
+        }
+    }
+
+    fn name(&self) -> &str {
+        self.bin.to_str().expect("we'll always get valid UTF-8")
     }
 }
 

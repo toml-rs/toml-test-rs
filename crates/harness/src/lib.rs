@@ -11,7 +11,10 @@ pub struct DecoderHarness<D> {
     matches: Option<Matches>,
 }
 
-impl<D: toml_test::verify::Decoder + Send + Sync + 'static> DecoderHarness<D> {
+impl<D> DecoderHarness<D>
+where
+    D: toml_test::verify::Decoder + Send + Sync + 'static,
+{
     pub fn new(decoder: D) -> Self {
         Self {
             decoder,
@@ -78,6 +81,65 @@ impl<D: toml_test::verify::Decoder + Send + Sync + 'static> DecoderHarness<D> {
                     msg: Some(err.to_string()),
                 },
             },
+        })
+        .exit()
+    }
+}
+
+pub struct EncoderHarness<E, D> {
+    encoder: E,
+    fixture: D,
+    matches: Option<Matches>,
+}
+
+impl<E, D> EncoderHarness<E, D>
+where
+    E: toml_test::verify::Encoder + Send + Sync + 'static,
+    D: toml_test::verify::Decoder + Send + Sync + 'static,
+{
+    pub fn new(encoder: E, fixture: D) -> Self {
+        Self {
+            encoder,
+            fixture,
+            matches: None,
+        }
+    }
+
+    pub fn ignore<'p>(
+        &mut self,
+        patterns: impl IntoIterator<Item = &'p str>,
+    ) -> Result<&mut Self, toml_test::Error> {
+        self.matches = Some(Matches::new(patterns.into_iter())?);
+        Ok(self)
+    }
+
+    pub fn test(self) -> ! {
+        let args = libtest_mimic::Arguments::from_args();
+        let mut tests = Vec::new();
+        tests.extend(toml_test_data::valid().map(|c| {
+            libtest_mimic::Test {
+                name: c.name.display().to_string(),
+                kind: "".into(),
+                is_ignored: self
+                    .matches
+                    .as_ref()
+                    .map(|m| !m.matched(c.name))
+                    .unwrap_or_default(),
+                is_bench: false,
+                data: Case::from(c),
+            }
+        }));
+
+        libtest_mimic::run_tests(&args, tests, move |test| match test.data {
+            Case::Valid(case) => {
+                match self.encoder.verify_valid_case(case.expected, &self.fixture) {
+                    Ok(()) => libtest_mimic::Outcome::Passed,
+                    Err(err) => libtest_mimic::Outcome::Failed {
+                        msg: Some(err.to_string()),
+                    },
+                }
+            }
+            Case::Invalid(_) => unreachable!("No invalid cases"),
         })
         .exit()
     }
