@@ -18,7 +18,7 @@ impl Decoded {
         serde_json::to_string_pretty(self).map_err(crate::Error::new)
     }
 
-    /// External parser helper for [verify]
+    /// External parser helper for [`verify`][crate::verify]
     pub fn from_stdin() -> Result<Self, crate::Error> {
         let mut buf = Vec::new();
         std::io::stdin()
@@ -27,7 +27,7 @@ impl Decoded {
         Self::from_slice(&buf)
     }
 
-    /// External parser helper for [verify]
+    /// External parser helper for [`verify`][crate::verify]
     pub fn into_stdout(&self) -> Result<(), crate::Error> {
         let s = self.to_string_pretty()?;
         std::io::stdout()
