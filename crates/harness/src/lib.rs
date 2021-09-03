@@ -1,7 +1,7 @@
 use std::io::Write;
 
-pub use toml_test::encoded::Encoded;
-pub use toml_test::encoded::EncodedValue;
+pub use toml_test::decoded::Decoded;
+pub use toml_test::decoded::DecodedValue;
 pub use toml_test::verify::Decoder;
 pub use toml_test::verify::Encoder;
 pub use toml_test::Error;
