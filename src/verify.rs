@@ -1,17 +1,17 @@
 use std::io::Write;
 
 pub trait Encoder {
-    fn encode(&self, data: crate::encoded::Encoded) -> Result<String, crate::Error>;
+    fn encode(&self, data: crate::decoded::Decoded) -> Result<String, crate::Error>;
 
     fn name(&self) -> &str;
 }
 
 pub trait Decoder {
-    fn decode(&self, data: &[u8]) -> Result<crate::encoded::Encoded, crate::Error>;
+    fn decode(&self, data: &[u8]) -> Result<crate::decoded::Decoded, crate::Error>;
 
     fn verify_valid_case(&self, fixture: &[u8], expected: &[u8]) -> Result<(), crate::Error> {
         let actual = self.decode(fixture)?;
-        let expected = crate::encoded::Encoded::from_slice(expected)?;
+        let expected = crate::decoded::Decoded::from_slice(expected)?;
         if actual == expected {
             Ok(())
         } else {
@@ -50,7 +50,7 @@ impl Command {
 }
 
 impl Decoder for Command {
-    fn decode(&self, data: &[u8]) -> Result<crate::encoded::Encoded, crate::Error> {
+    fn decode(&self, data: &[u8]) -> Result<crate::decoded::Decoded, crate::Error> {
         let mut cmd = std::process::Command::new(&self.bin);
         cmd.stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
@@ -66,7 +66,7 @@ impl Decoder for Command {
         let output = child.wait_with_output().map_err(crate::Error::new)?;
         if output.status.success() {
             let output =
-                crate::encoded::Encoded::from_slice(&output.stdout).map_err(crate::Error::new)?;
+                crate::decoded::Decoded::from_slice(&output.stdout).map_err(crate::Error::new)?;
             Ok(output)
         } else {
             let message = String::from_utf8_lossy(&output.stderr);

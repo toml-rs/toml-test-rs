@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+#### Breaking Changes
+
+- Fixed the naming of `Encoded` to `Decoded`
+
 ## [0.2.5] - 2021-08-24
 
 - Improve panic message
