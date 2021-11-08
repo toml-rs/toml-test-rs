@@ -8,6 +8,13 @@ readme = "README.md"
 categories = ["development-tools:testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
 edition = "2018"
+include = [
+  "src/**/*",
+  "Cargo.toml",
+  "LICENSE*",
+  "README.md",
+  "examples/**/*"
+]
 
 [dependencies]
 include_dir = "0.6"
