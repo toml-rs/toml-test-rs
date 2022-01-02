@@ -1,7 +1,7 @@
 use std::io::Write;
 
+use clap::Parser;
 use proc_exit::WithCodeResultExt;
-use structopt::StructOpt;
 
 fn main() {
     let result = run();
@@ -9,7 +9,7 @@ fn main() {
 }
 
 fn run() -> proc_exit::ExitResult {
-    let args = Args::from_args();
+    let args = Args::parse();
     init_logging(args.verbose);
 
     let matches = Matches::new(args.ignore.iter().map(|s| s.as_str()))
@@ -129,19 +129,25 @@ impl Matches {
     }
 }
 
-#[derive(StructOpt, Debug, Clone)]
+#[derive(Parser, Debug, Clone)]
 struct Args {
     /// Encoder/decoder binary
     bin: Vec<std::path::PathBuf>,
 
     /// `bin` is an encoder, instead of a decoder
-    #[structopt(long)]
+    #[clap(long)]
     encoder: bool,
 
     /// Cases to ignore (gitignore glob syntax)
-    #[structopt(long)]
+    #[clap(long)]
     ignore: Vec<String>,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     verbose: clap_verbosity_flag::Verbosity,
+}
+
+#[test]
+fn verify_app() {
+    use clap::IntoApp;
+    Args::into_app().debug_assert()
 }
