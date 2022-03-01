@@ -83,9 +83,7 @@ fn verify_decoder(
     Ok(())
 }
 
-fn init_logging(mut level: clap_verbosity_flag::Verbosity) {
-    level.set_default(Some(log::Level::Info));
-
+fn init_logging(level: clap_verbosity_flag::Verbosity<clap_verbosity_flag::InfoLevel>) {
     if let Some(level) = level.log_level() {
         let mut builder = env_logger::Builder::new();
 
@@ -143,11 +141,11 @@ struct Args {
     ignore: Vec<String>,
 
     #[clap(flatten)]
-    verbose: clap_verbosity_flag::Verbosity,
+    verbose: clap_verbosity_flag::Verbosity<clap_verbosity_flag::InfoLevel>,
 }
 
 #[test]
 fn verify_app() {
-    use clap::IntoApp;
-    Args::into_app().debug_assert()
+    use clap::CommandFactory;
+    Args::command().debug_assert()
 }
