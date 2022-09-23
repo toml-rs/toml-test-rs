@@ -572,7 +572,7 @@ dependencies = [
 
 [[package]]
 name = "toml-test-cli"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "clap",
  "clap-verbosity-flag",
