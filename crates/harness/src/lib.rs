@@ -130,7 +130,7 @@ where
                 .map(move |(case, ignore)| {
                     libtest_mimic::Trial::test(case.name.display().to_string(), move || {
                         encoder
-                            .verify_valid_case(case.fixture, &fixture)
+                            .verify_valid_case(case.expected, &fixture)
                             .map_err(libtest_mimic::Failed::from)
                     })
                     .with_ignored_flag(ignore)
