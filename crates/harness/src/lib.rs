@@ -13,7 +13,7 @@ pub struct DecoderHarness<D> {
 
 impl<D> DecoderHarness<D>
 where
-    D: toml_test::verify::Decoder + Send + Sync + 'static,
+    D: toml_test::verify::Decoder + Copy + Send + Sync + 'static,
 {
     pub fn new(decoder: D) -> Self {
         Self {
@@ -32,57 +32,56 @@ where
 
     pub fn test(self) -> ! {
         let args = libtest_mimic::Arguments::from_args();
-        let mut tests = Vec::new();
-        tests.extend(toml_test_data::valid().map(|c| {
-            libtest_mimic::Test {
-                name: c.name.display().to_string(),
-                kind: "".into(),
-                is_ignored: self
-                    .matches
-                    .as_ref()
-                    .map(|m| !m.matched(c.name))
-                    .unwrap_or_default(),
-                is_bench: false,
-                data: Case::from(c),
-            }
-        }));
-        tests.extend(toml_test_data::invalid().map(|c| {
-            libtest_mimic::Test {
-                name: c.name.display().to_string(),
-                kind: "".into(),
-                is_ignored: self
-                    .matches
-                    .as_ref()
-                    .map(|m| !m.matched(c.name))
-                    .unwrap_or_default(),
-                is_bench: false,
-                data: Case::from(c),
-            }
-        }));
-
         let nocapture = args.nocapture;
-        libtest_mimic::run_tests(&args, tests, move |test| match test.data {
-            Case::Valid(case) => {
-                match self.decoder.verify_valid_case(case.fixture, case.expected) {
-                    Ok(()) => libtest_mimic::Outcome::Passed,
-                    Err(err) => libtest_mimic::Outcome::Failed {
-                        msg: Some(err.to_string()),
-                    },
-                }
-            }
-            Case::Invalid(case) => match self.decoder.verify_invalid_case(case.fixture) {
-                Ok(err) => {
-                    if nocapture {
-                        let _ = writeln!(std::io::stdout(), "{}", err);
-                    }
-                    libtest_mimic::Outcome::Passed
-                }
-                Err(err) => libtest_mimic::Outcome::Failed {
-                    msg: Some(err.to_string()),
-                },
-            },
-        })
-        .exit()
+
+        let mut tests = Vec::new();
+        let decoder = self.decoder;
+        tests.extend(
+            toml_test_data::valid()
+                .map(|case| {
+                    let ignore = self
+                        .matches
+                        .as_ref()
+                        .map(|m| !m.matched(case.name))
+                        .unwrap_or_default();
+                    (case, ignore)
+                })
+                .map(move |(case, ignore)| {
+                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
+                        decoder
+                            .verify_valid_case(case.fixture, case.expected)
+                            .map_err(libtest_mimic::Failed::from)
+                    })
+                    .with_ignored_flag(ignore)
+                }),
+        );
+        tests.extend(
+            toml_test_data::invalid()
+                .map(|case| {
+                    let ignore = self
+                        .matches
+                        .as_ref()
+                        .map(|m| !m.matched(case.name))
+                        .unwrap_or_default();
+                    (case, ignore)
+                })
+                .map(move |(case, ignore)| {
+                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
+                        match decoder.verify_invalid_case(case.fixture) {
+                            Ok(err) => {
+                                if nocapture {
+                                    let _ = writeln!(std::io::stdout(), "{}", err);
+                                }
+                                Ok(())
+                            }
+                            Err(err) => Err(libtest_mimic::Failed::from(err)),
+                        }
+                    })
+                    .with_ignored_flag(ignore)
+                }),
+        );
+
+        libtest_mimic::run(&args, tests).exit()
     }
 }
 
@@ -94,8 +93,8 @@ pub struct EncoderHarness<E, D> {
 
 impl<E, D> EncoderHarness<E, D>
 where
-    E: toml_test::verify::Encoder + Send + Sync + 'static,
-    D: toml_test::verify::Decoder + Send + Sync + 'static,
+    E: toml_test::verify::Encoder + Copy + Send + Sync + 'static,
+    D: toml_test::verify::Decoder + Copy + Send + Sync + 'static,
 {
     pub fn new(encoder: E, fixture: D) -> Self {
         Self {
@@ -116,49 +115,28 @@ where
     pub fn test(self) -> ! {
         let args = libtest_mimic::Arguments::from_args();
         let mut tests = Vec::new();
-        tests.extend(toml_test_data::valid().map(|c| {
-            libtest_mimic::Test {
-                name: c.name.display().to_string(),
-                kind: "".into(),
-                is_ignored: self
-                    .matches
-                    .as_ref()
-                    .map(|m| !m.matched(c.name))
-                    .unwrap_or_default(),
-                is_bench: false,
-                data: Case::from(c),
-            }
-        }));
-
-        libtest_mimic::run_tests(&args, tests, move |test| match test.data {
-            Case::Valid(case) => {
-                match self.encoder.verify_valid_case(case.expected, &self.fixture) {
-                    Ok(()) => libtest_mimic::Outcome::Passed,
-                    Err(err) => libtest_mimic::Outcome::Failed {
-                        msg: Some(err.to_string()),
-                    },
-                }
-            }
-            Case::Invalid(_) => unreachable!("No invalid cases"),
-        })
-        .exit()
-    }
-}
-
-enum Case {
-    Valid(toml_test_data::Valid<'static>),
-    Invalid(toml_test_data::Invalid<'static>),
-}
-
-impl From<toml_test_data::Valid<'static>> for Case {
-    fn from(other: toml_test_data::Valid<'static>) -> Self {
-        Self::Valid(other)
-    }
-}
-
-impl From<toml_test_data::Invalid<'static>> for Case {
-    fn from(other: toml_test_data::Invalid<'static>) -> Self {
-        Self::Invalid(other)
+        let encoder = self.encoder;
+        let fixture = self.fixture;
+        tests.extend(
+            toml_test_data::valid()
+                .map(|case| {
+                    let ignore = self
+                        .matches
+                        .as_ref()
+                        .map(|m| !m.matched(case.name))
+                        .unwrap_or_default();
+                    (case, ignore)
+                })
+                .map(move |(case, ignore)| {
+                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
+                        encoder
+                            .verify_valid_case(case.fixture, &fixture)
+                            .map_err(libtest_mimic::Failed::from)
+                    })
+                    .with_ignored_flag(ignore)
+                }),
+        );
+        libtest_mimic::run(&args, tests).exit()
     }
 }
 
