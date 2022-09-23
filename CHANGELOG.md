@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.3.3] - 2022-09-23
+
 ## [0.3.2] - 2022-09-23
 
 ## [0.3.1] - 2021-09-03
@@ -40,7 +42,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2021-08-16
 
 <!-- next-url -->
-[Unreleased]: https://github.com/epage/git-stack/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/epage/git-stack/compare/v0.3.3...HEAD
+[0.3.3]: https://github.com/epage/git-stack/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/epage/git-stack/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/epage/git-stack/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/epage/git-stack/compare/v0.2.5...v0.3.0
