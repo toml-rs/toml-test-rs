@@ -7,7 +7,7 @@ members = [
 
 [package]
 name = "toml-test"
-version = "0.3.3"
+version = "0.3.4"
 description = "Verify Rust TOML parsers"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/epage/toml-test-rs"
