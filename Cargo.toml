@@ -15,7 +15,8 @@ documentation = "http://docs.rs/toml-test"
 readme = "README.md"
 categories = ["development-tools:testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
-edition = "2018"
+edition = "2021"
+rust-version = "1.60.0"  # MSRV
 include = [
   "src/**/*",
   "Cargo.toml",
