@@ -50,7 +50,7 @@ where
                     libtest_mimic::Trial::test(case.name.display().to_string(), move || {
                         decoder
                             .verify_valid_case(case.fixture, case.expected)
-                            .map_err(|e| libtest_mimic::Failed::from(e))
+                            .map_err(libtest_mimic::Failed::from)
                     })
                     .with_ignored_flag(ignore)
                 }),
@@ -131,7 +131,7 @@ where
                     libtest_mimic::Trial::test(case.name.display().to_string(), move || {
                         encoder
                             .verify_valid_case(case.fixture, &fixture)
-                            .map_err(|e| libtest_mimic::Failed::from(e))
+                            .map_err(libtest_mimic::Failed::from)
                     })
                     .with_ignored_flag(ignore)
                 }),
