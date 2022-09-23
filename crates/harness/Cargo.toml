@@ -20,5 +20,5 @@ include = [
 [dependencies]
 toml-test-data = { version = "1.0", path = "../data" }
 toml-test = { version = "^0.3", path = "../../" }
-ignore = "0.4"
+ignore = "0.4.18"
 libtest-mimic = "0.5.2"
