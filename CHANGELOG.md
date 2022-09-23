@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixes
+
+- Dropped dependency on `time` crate
+
 ## [0.3.3] - 2022-09-23
 
 ## [0.3.2] - 2022-09-23
