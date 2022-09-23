@@ -11,7 +11,13 @@ pub enum Decoded {
 
 impl Decoded {
     pub fn from_slice(v: &[u8]) -> Result<Self, crate::Error> {
-        serde_json::from_slice(v).map_err(crate::Error::new)
+        serde_json::from_slice(v).map_err(|e| {
+            crate::Error::new(format!(
+                "failed decoding: {}\n```json\n{}\n```",
+                e,
+                String::from_utf8_lossy(v)
+            ))
+        })
     }
 
     pub fn to_string_pretty(&self) -> Result<String, crate::Error> {
