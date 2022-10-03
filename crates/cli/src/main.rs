@@ -133,14 +133,14 @@ struct Args {
     bin: Vec<std::path::PathBuf>,
 
     /// `bin` is an encoder, instead of a decoder
-    #[clap(long)]
+    #[arg(long)]
     encoder: bool,
 
     /// Cases to ignore (gitignore glob syntax)
-    #[clap(long)]
+    #[arg(long)]
     ignore: Vec<String>,
 
-    #[clap(flatten)]
+    #[command(flatten)]
     verbose: clap_verbosity_flag::Verbosity<clap_verbosity_flag::InfoLevel>,
 }
 
