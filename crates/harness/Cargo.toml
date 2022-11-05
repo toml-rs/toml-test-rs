@@ -1,6 +1,6 @@
 [package]
 name = "toml-test-harness"
-version = "0.4.1"
+version = "0.4.2"
 description = "Cargo test harness for verifying TOML parsers"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/epage/toml-test-rs"
@@ -18,7 +18,7 @@ include = [
 ]
 
 [dependencies]
-toml-test-data = { version = "1.0", path = "../data" }
+toml-test-data = { version = "1.1", path = "../data" }
 toml-test = { version = "^0.3", path = "../../" }
 ignore = "0.4.18"
 libtest-mimic = "0.5.2"
