@@ -1,8 +1,6 @@
 [workspace]
 members = [
-    "crates/data",
-    "crates/cli",
-    "crates/harness",
+    "crates/*",
 ]
 
 [package]

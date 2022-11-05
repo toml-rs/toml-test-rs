@@ -73,8 +73,8 @@ checksum = "86447ad904c7fb335a790c9d7fe3d0d971dc523b8ccd1561a520de9a85302750"
 dependencies = [
  "atty",
  "bitflags",
- "clap_derive 3.2.18",
- "clap_lex 0.2.4",
+ "clap_derive",
+ "clap_lex",
  "indexmap",
  "once_cell",
  "strsim",
@@ -83,48 +83,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "clap"
-version = "4.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5840cd9093aabeabf7fd932754c435b7674520fc3ddc935c397837050f0f1e4b"
-dependencies = [
- "atty",
- "bitflags",
- "clap_derive 4.0.8",
- "clap_lex 0.3.0",
- "once_cell",
- "strsim",
- "termcolor",
-]
-
-[[package]]
-name = "clap-verbosity-flag"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23e2b6c3dcdb73299f48ae05b294da14e2f560b3ed2c09e742269eb1b22af231"
-dependencies = [
- "clap 4.0.8",
- "log",
-]
-
-[[package]]
 name = "clap_derive"
 version = "3.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea0c8bce528c4be4da13ea6fead8965e95b6073585a2f05204bd8f4119f82a65"
-dependencies = [
- "heck",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "clap_derive"
-version = "4.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92289ffc6fb4a85d85c246ddb874c05a87a2e540fb6ad52f7ca07c8c1e1840b1"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -143,41 +105,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "clap_lex"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d4198f73e42b4936b35b5bb248d81d2b595ecb170da0bac7655c54eedfa8da8"
-dependencies = [
- "os_str_bytes",
-]
-
-[[package]]
 name = "crossbeam-utils"
 version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "edbafec5fa1f196ca66527c1b12c2ec4745ca14b50f1ad8f9f6f720b55d11fac"
 dependencies = [
  "cfg-if",
-]
-
-[[package]]
-name = "env_logger"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c90bf5f19754d10198ccb95b70664fc925bd1fc090a0fd9a6ebc54acc8cd6272"
-dependencies = [
- "log",
- "termcolor",
-]
-
-[[package]]
-name = "eyre"
-version = "0.6.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c2b6b5a29c02cdc822728b7d7b8ae1bab3e3b05d44522770ddd49722eeac7eb"
-dependencies = [
- "indenter",
- "once_cell",
 ]
 
 [[package]]
@@ -269,12 +202,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "indenter"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce23b50ad8242c51a442f3ff322d56b02f08852c77e4c0b4d3fd684abc89c683"
-
-[[package]]
 name = "indexmap"
 version = "1.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -308,7 +235,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79529479c298f5af41375b0c1a77ef670d450b4c9cd7949d2b43af08121b20ec"
 dependencies = [
- "clap 3.2.22",
+ "clap",
  "termcolor",
  "threadpool",
 ]
@@ -368,12 +295,6 @@ name = "os_str_bytes"
 version = "6.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ff7415e9ae3fff1225851df9e0d9e4e5479f947619774677a63572e55e80eff"
-
-[[package]]
-name = "proc-exit"
-version = "1.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0da6bbc8ef87314d4f596ad9d02db375c3f2d77fba91067a6f6a5754fdc8cb49"
 
 [[package]]
 name = "proc-macro-error"
@@ -543,21 +464,6 @@ dependencies = [
  "chrono",
  "serde",
  "serde_json",
- "toml-test-data",
-]
-
-[[package]]
-name = "toml-test-cli"
-version = "0.3.1"
-dependencies = [
- "clap 4.0.8",
- "clap-verbosity-flag",
- "env_logger",
- "eyre",
- "ignore",
- "log",
- "proc-exit",
- "toml-test",
  "toml-test-data",
 ]
 
