@@ -1,4 +1,5 @@
-const TESTS_DIR: include_dir::Dir = include_dir::include_dir!("assets/toml-test/tests");
+const TESTS_DIR: include_dir::Dir =
+    include_dir::include_dir!("$CARGO_MANIFEST_DIR/assets/toml-test/tests");
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Valid<'a> {
@@ -9,22 +10,21 @@ pub struct Valid<'a> {
 
 pub fn valid() -> impl Iterator<Item = Valid<'static>> {
     let valid_dir = TESTS_DIR.get_dir("valid").unwrap();
-    valid_files(valid_dir.files()).chain(valid_dir.dirs().iter().flat_map(|d| {
-        assert!(d.dirs().is_empty());
-        valid_files(d.files())
+    valid_files(valid_dir).chain(valid_dir.dirs().flat_map(|d| {
+        assert_eq!(d.dirs().count(), 0);
+        valid_files(d)
     }))
 }
 
-fn valid_files(
-    files: &'static [include_dir::File<'static>],
-) -> impl Iterator<Item = Valid<'static>> {
-    files
-        .iter()
+fn valid_files<'d>(
+    dir: &'d include_dir::Dir<'static>,
+) -> impl Iterator<Item = Valid<'static>> + 'd {
+    dir.files()
         .filter(|f| f.path().extension().unwrap_or_default() == "toml")
         .map(move |f| {
             let t = f;
-            let j = files
-                .iter()
+            let j = dir
+                .files()
                 .find(|f| {
                     f.path().parent() == t.path().parent()
                         && f.path().file_stem() == t.path().file_stem()
@@ -50,10 +50,10 @@ pub struct Invalid<'a> {
 
 pub fn invalid() -> impl Iterator<Item = Invalid<'static>> {
     let invalid_dir = TESTS_DIR.get_dir("invalid").unwrap();
-    assert!(invalid_dir.files().is_empty());
-    invalid_dir.dirs().iter().flat_map(|d| {
-        assert!(d.dirs().is_empty());
-        d.files().iter().map(|f| {
+    assert_eq!(invalid_dir.files().count(), 0);
+    invalid_dir.dirs().flat_map(|d| {
+        assert_eq!(d.dirs().count(), 0);
+        d.files().map(|f| {
             let t = f;
             let name = f.path();
             let fixture = t.contents();
