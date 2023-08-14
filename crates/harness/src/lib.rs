@@ -1,3 +1,5 @@
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
 use std::io::Write;
 
 pub use toml_test::decoded::Decoded;

@@ -2,26 +2,40 @@
 members = [
     "crates/*",
 ]
+resolver = "2"
+
+[workspace.package]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+rust-version = "1.65.0"  # MSRV
+include = [
+  "build.rs",
+  "src/**/*",
+  "Cargo.toml",
+  "Cargo.lock",
+  "LICENSE*",
+  "README.md",
+  "benches/**/*",
+  "examples/**/*"
+]
 
 [package]
 name = "toml-test"
 version = "0.3.5"
 description = "Verify Rust TOML parsers"
-license = "MIT OR Apache-2.0"
 repository = "https://github.com/epage/toml-test-rs"
 documentation = "http://docs.rs/toml-test"
 readme = "README.md"
 categories = ["development-tools:testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
-edition = "2021"
-rust-version = "1.60.0"  # MSRV
-include = [
-  "src/**/*",
-  "Cargo.toml",
-  "LICENSE*",
-  "README.md",
-  "examples/**/*"
-]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+include.workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [package.metadata.release]
 pre-release-replacements = [
