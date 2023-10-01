@@ -27,7 +27,7 @@ jobs:
     continue-on-error: true
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
     - uses: actions-rs/audit-check@v1
@@ -44,7 +44,7 @@ jobs:
         checks:
           - bans licenses sources
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
     - uses: EmbarkStudios/cargo-deny-action@v1
