@@ -11,6 +11,7 @@ pub use toml_test::Error;
 pub struct DecoderHarness<D> {
     decoder: D,
     matches: Option<Matches>,
+    version: Option<String>,
 }
 
 impl<D> DecoderHarness<D>
@@ -21,6 +22,7 @@ where
         Self {
             decoder,
             matches: None,
+            version: None,
         }
     }
 
@@ -32,9 +34,21 @@ where
         Ok(self)
     }
 
+    pub fn version(&mut self, version: impl Into<String>) -> &mut Self {
+        self.version = Some(version.into());
+        self
+    }
+
     pub fn test(self) -> ! {
         let args = libtest_mimic::Arguments::from_args();
         let nocapture = args.nocapture;
+
+        let versioned = self
+            .version
+            .as_deref()
+            .into_iter()
+            .flat_map(toml_test_data::version)
+            .collect::<std::collections::HashSet<_>>();
 
         let mut tests = Vec::new();
         let decoder = self.decoder;
@@ -45,7 +59,8 @@ where
                         .matches
                         .as_ref()
                         .map(|m| !m.matched(case.name))
-                        .unwrap_or_default();
+                        .unwrap_or_default()
+                        || !versioned.contains(case.name);
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
@@ -64,7 +79,8 @@ where
                         .matches
                         .as_ref()
                         .map(|m| !m.matched(case.name))
-                        .unwrap_or_default();
+                        .unwrap_or_default()
+                        || !versioned.contains(case.name);
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
