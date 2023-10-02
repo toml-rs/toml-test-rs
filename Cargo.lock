@@ -496,7 +496,7 @@ dependencies = [
 
 [[package]]
 name = "toml-test-harness"
-version = "0.4.4"
+version = "0.4.5"
 dependencies = [
  "ignore",
  "libtest-mimic",
