@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.3.6] - 2023-10-02
+
 ### Compatibility
 
 - Update MSRV to 1.66
@@ -54,7 +56,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2021-08-16
 
 <!-- next-url -->
-[Unreleased]: https://github.com/epage/git-stack/compare/v0.3.5...HEAD
+[Unreleased]: https://github.com/epage/git-stack/compare/v0.3.6...HEAD
+[0.3.6]: https://github.com/epage/git-stack/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/epage/git-stack/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/epage/git-stack/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/epage/git-stack/compare/v0.3.2...v0.3.3
