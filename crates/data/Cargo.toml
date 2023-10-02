@@ -9,7 +9,17 @@ keywords = ["development", "toml"]
 license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-include.workspace = true
+include = [
+  "build.rs",
+  "src/**/*",
+  "Cargo.toml",
+  "Cargo.lock",
+  "LICENSE*",
+  "README.md",
+  "benches/**/*",
+  "examples/**/*",
+  "assets/**/*",
+]
 
 [package.metadata.docs.rs]
 all-features = true
