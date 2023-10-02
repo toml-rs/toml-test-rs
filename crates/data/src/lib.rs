@@ -3,6 +3,31 @@
 const TESTS_DIR: include_dir::Dir =
     include_dir::include_dir!("$CARGO_MANIFEST_DIR/assets/toml-test/tests");
 
+pub fn version(ver: &str) -> impl Iterator<Item = &'static std::path::Path> {
+    TESTS_DIR
+        .get_file(&format!("files-toml-{ver}"))
+        .and_then(|f| std::str::from_utf8(f.contents()).ok())
+        .into_iter()
+        .flat_map(|f| f.lines())
+        .map(std::path::Path::new)
+}
+
+pub fn versions() -> std::collections::HashMap<&'static str, Vec<&'static std::path::Path>> {
+    TESTS_DIR
+        .files()
+        .filter_map(|f| {
+            let name = f.path().file_name()?;
+            let version = name.to_str()?.strip_prefix("files-toml-")?;
+            let paths = std::str::from_utf8(f.contents())
+                .ok()?
+                .lines()
+                .map(std::path::Path::new)
+                .collect::<Vec<_>>();
+            Some((version, paths))
+        })
+        .collect()
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Valid<'a> {
     pub name: &'a std::path::Path,
