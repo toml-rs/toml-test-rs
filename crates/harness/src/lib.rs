@@ -107,6 +107,7 @@ pub struct EncoderHarness<E, D> {
     encoder: E,
     fixture: D,
     matches: Option<Matches>,
+    version: Option<String>,
 }
 
 impl<E, D> EncoderHarness<E, D>
@@ -119,6 +120,7 @@ where
             encoder,
             fixture,
             matches: None,
+            version: None,
         }
     }
 
@@ -130,8 +132,21 @@ where
         Ok(self)
     }
 
+    pub fn version(&mut self, version: impl Into<String>) -> &mut Self {
+        self.version = Some(version.into());
+        self
+    }
+
     pub fn test(self) -> ! {
         let args = libtest_mimic::Arguments::from_args();
+
+        let versioned = self
+            .version
+            .as_deref()
+            .into_iter()
+            .flat_map(toml_test_data::version)
+            .collect::<std::collections::HashSet<_>>();
+
         let mut tests = Vec::new();
         let encoder = self.encoder;
         let fixture = self.fixture;
@@ -142,7 +157,8 @@ where
                         .matches
                         .as_ref()
                         .map(|m| !m.matched(case.name))
-                        .unwrap_or_default();
+                        .unwrap_or_default()
+                        || !versioned.contains(case.name);
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
