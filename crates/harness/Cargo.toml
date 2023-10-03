@@ -1,6 +1,6 @@
 [package]
 name = "toml-test-harness"
-version = "0.4.6"
+version = "0.4.7"
 description = "Cargo test harness for verifying TOML parsers"
 repository = "https://github.com/epage/toml-test-rs"
 readme = "README.md"
