@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixes
+
+- Properly render floats to not cause failures when the parser succeeds
+
 ## [0.3.6] - 2023-10-02
 
 ### Compatibility
