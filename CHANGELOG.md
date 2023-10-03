@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.3.7] - 2023-10-03
+
 ### Fixes
 
 - Properly render floats to not cause failures when the parser succeeds
@@ -60,7 +62,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2021-08-16
 
 <!-- next-url -->
-[Unreleased]: https://github.com/epage/git-stack/compare/v0.3.6...HEAD
+[Unreleased]: https://github.com/epage/git-stack/compare/v0.3.7...HEAD
+[0.3.7]: https://github.com/epage/git-stack/compare/v0.3.6...v0.3.7
 [0.3.6]: https://github.com/epage/git-stack/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/epage/git-stack/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/epage/git-stack/compare/v0.3.3...v0.3.4
