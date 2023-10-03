@@ -389,9 +389,9 @@ dependencies = [
 
 [[package]]
 name = "ryu"
-version = "1.0.11"
+version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4501abdff3ae82a1c1b477a17252eb69cee9e66eb915c1abaa4f44d873df9f09"
+checksum = "1ad4cc8da4ef723ed60bced201181d83791ad433213d8c24efffda1eec85d741"
 
 [[package]]
 name = "same-file"
@@ -482,6 +482,7 @@ name = "toml-test"
 version = "0.3.6"
 dependencies = [
  "chrono",
+ "ryu",
  "serde",
  "serde_json",
  "toml-test-data",

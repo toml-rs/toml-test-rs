@@ -104,13 +104,9 @@ impl From<f64> for DecodedValue {
         } else if other.is_infinite() && other.is_sign_positive() {
             "inf".to_owned()
         } else {
-            let s = format!("{:.15}", other);
-            let s = s.trim_end_matches('0');
-            if s.ends_with('.') {
-                format!("{}0", s)
-            } else {
-                s.to_owned()
-            }
+            let mut buffer = ryu::Buffer::new();
+            let printed = buffer.format(other);
+            printed.to_owned()
         };
         DecodedValue::Float(s)
     }
