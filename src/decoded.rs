@@ -89,6 +89,12 @@ impl From<String> for DecodedValue {
     }
 }
 
+impl From<u64> for DecodedValue {
+    fn from(other: u64) -> Self {
+        DecodedValue::Integer(other.to_string())
+    }
+}
+
 impl From<i64> for DecodedValue {
     fn from(other: i64) -> Self {
         DecodedValue::Integer(other.to_string())
