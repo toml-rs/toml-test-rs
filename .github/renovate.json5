@@ -25,6 +25,9 @@
       datasourceTemplate: 'github-releases',
     },
   ],
+  git-submodules: {
+    enabled: true,
+  },
   packageRules: [
     {
       commitMessageTopic: 'MSRV',
