@@ -25,7 +25,7 @@
       datasourceTemplate: 'github-releases',
     },
   ],
-  git-submodules: {
+  "git-submodules": {
     enabled: true,
   },
   packageRules: [
