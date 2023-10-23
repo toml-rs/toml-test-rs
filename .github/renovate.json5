@@ -44,6 +44,14 @@
         '* * * * *',
       ],
     },
+    {
+      matchManagers: [
+        'git-submodules',
+      ],
+      schedule: [
+        '* * * * *',
+      ],
+    },
     // Goals:
     // - Keep version reqs low, ignoring compatible normal/build dependencies
     // - Take advantage of latest dev-dependencies
