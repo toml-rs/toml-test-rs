@@ -490,7 +490,7 @@ dependencies = [
 
 [[package]]
 name = "toml-test-data"
-version = "1.6.0"
+version = "1.7.0"
 dependencies = [
  "include_dir",
 ]
