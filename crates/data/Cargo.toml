@@ -27,3 +27,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 include_dir = "0.7.0"
+
+[lints]
+workspace = true

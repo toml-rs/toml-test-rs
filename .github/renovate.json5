@@ -3,6 +3,7 @@
     'before 5am on the first day of the month',
   ],
   semanticCommits: 'enabled',
+  commitMessageLowerCase: 'never',
   configMigration: true,
   dependencyDashboard: true,
   customManagers: [
@@ -17,10 +18,10 @@
         '^\\.github/workflows/rust-next.yml$',
       ],
       matchStrings: [
-        'MSRV.*?(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)',
-        '(?<currentValue>\\d+\\.\\d+(\\.\\d+)?).*?MSRV',
+        'STABLE.*?(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)',
+        '(?<currentValue>\\d+\\.\\d+(\\.\\d+)?).*?STABLE',
       ],
-      depNameTemplate: 'rust',
+      depNameTemplate: 'STABLE',
       packageNameTemplate: 'rust-lang/rust',
       datasourceTemplate: 'github-releases',
     },
@@ -30,19 +31,18 @@
   },
   packageRules: [
     {
-      commitMessageTopic: 'MSRV',
+      commitMessageTopic: 'Rust Stable',
       matchManagers: [
         'custom.regex',
       ],
       matchPackageNames: [
-        'rust',
+        'STABLE',
       ],
-      minimumReleaseAge: '252 days',  // 6 releases * 6 weeks per release * 7 days per week
-      internalChecksFilter: 'strict',
       extractVersion: '^(?<version>\\d+\\.\\d+)',  // Drop the patch version
       schedule: [
         '* * * * *',
       ],
+      automerge: true,
     },
     {
       matchManagers: [
@@ -83,6 +83,7 @@
       matchCurrentVersion: '>=1.0.0',
       matchUpdateTypes: [
         'minor',
+        'patch',
       ],
       enabled: false,
     },
@@ -110,6 +111,7 @@
       matchCurrentVersion: '>=1.0.0',
       matchUpdateTypes: [
         'minor',
+        'patch',
       ],
       automerge: true,
       groupName: 'compatible (dev)',
