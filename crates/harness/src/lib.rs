@@ -1,4 +1,6 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![warn(clippy::print_stderr)]
+#![warn(clippy::print_stdout)]
 
 use std::io::Write;
 
@@ -16,7 +18,7 @@ pub struct DecoderHarness<D> {
 
 impl<D> DecoderHarness<D>
 where
-    D: toml_test::verify::Decoder + Copy + Send + Sync + 'static,
+    D: Decoder + Copy + Send + Sync + 'static,
 {
     pub fn new(decoder: D) -> Self {
         Self {
@@ -29,7 +31,7 @@ where
     pub fn ignore<'p>(
         &mut self,
         patterns: impl IntoIterator<Item = &'p str>,
-    ) -> Result<&mut Self, toml_test::Error> {
+    ) -> Result<&mut Self, Error> {
         self.matches = Some(Matches::new(patterns.into_iter())?);
         Ok(self)
     }
@@ -112,8 +114,8 @@ pub struct EncoderHarness<E, D> {
 
 impl<E, D> EncoderHarness<E, D>
 where
-    E: toml_test::verify::Encoder + Copy + Send + Sync + 'static,
-    D: toml_test::verify::Decoder + Copy + Send + Sync + 'static,
+    E: Encoder + Copy + Send + Sync + 'static,
+    D: Decoder + Copy + Send + Sync + 'static,
 {
     pub fn new(encoder: E, fixture: D) -> Self {
         Self {
@@ -127,7 +129,7 @@ where
     pub fn ignore<'p>(
         &mut self,
         patterns: impl IntoIterator<Item = &'p str>,
-    ) -> Result<&mut Self, toml_test::Error> {
+    ) -> Result<&mut Self, Error> {
         self.matches = Some(Matches::new(patterns.into_iter())?);
         Ok(self)
     }
@@ -179,7 +181,7 @@ struct Matches {
 }
 
 impl Matches {
-    fn new<'p>(patterns: impl Iterator<Item = &'p str>) -> Result<Self, toml_test::Error> {
+    fn new<'p>(patterns: impl Iterator<Item = &'p str>) -> Result<Self, Error> {
         let mut ignores = ignore::gitignore::GitignoreBuilder::new(".");
         for line in patterns {
             ignores

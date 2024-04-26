@@ -1,6 +1,9 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![warn(clippy::print_stderr)]
+#![warn(clippy::print_stdout)]
+#![allow(clippy::self_named_module_files)] // `include_dir!`?
 
-const TESTS_DIR: include_dir::Dir =
+const TESTS_DIR: include_dir::Dir<'_> =
     include_dir::include_dir!("$CARGO_MANIFEST_DIR/assets/toml-test/tests");
 
 pub fn version(ver: &str) -> impl Iterator<Item = &'static std::path::Path> {
