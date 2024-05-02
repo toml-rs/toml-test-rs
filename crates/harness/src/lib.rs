@@ -184,11 +184,9 @@ impl Matches {
     fn new<'p>(patterns: impl Iterator<Item = &'p str>) -> Result<Self, Error> {
         let mut ignores = ignore::gitignore::GitignoreBuilder::new(".");
         for line in patterns {
-            ignores
-                .add_line(None, line)
-                .map_err(toml_test::Error::new)?;
+            ignores.add_line(None, line).map_err(Error::new)?;
         }
-        let ignores = ignores.build().map_err(toml_test::Error::new)?;
+        let ignores = ignores.build().map_err(Error::new)?;
         Ok(Self { ignores })
     }
 
