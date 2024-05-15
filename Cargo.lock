@@ -432,7 +432,7 @@ dependencies = [
 
 [[package]]
 name = "toml-test"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "chrono",
  "ryu",
@@ -443,14 +443,14 @@ dependencies = [
 
 [[package]]
 name = "toml-test-data"
-version = "1.8.0"
+version = "1.8.1"
 dependencies = [
  "include_dir",
 ]
 
 [[package]]
 name = "toml-test-harness"
-version = "0.4.8"
+version = "0.4.9"
 dependencies = [
  "ignore",
  "libtest-mimic",

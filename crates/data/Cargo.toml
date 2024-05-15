@@ -1,6 +1,6 @@
 [package]
 name = "toml-test-data"
-version = "1.8.0"
+version = "1.8.1"
 description = "TOML test cases"
 repository = "https://github.com/epage/toml-test-rs"
 readme = "README.md"
