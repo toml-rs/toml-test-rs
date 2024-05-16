@@ -443,7 +443,7 @@ dependencies = [
 
 [[package]]
 name = "toml-test-data"
-version = "1.9.0"
+version = "1.10.0"
 dependencies = [
  "include_dir",
 ]
