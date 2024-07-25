@@ -91,7 +91,7 @@ zero_sized_map_values = "warn"
 
 [package]
 name = "toml-test"
-version = "1.0.1"
+version = "1.0.2"
 description = "Verify Rust TOML parsers"
 repository = "https://github.com/epage/toml-test-rs"
 documentation = "http://docs.rs/toml-test"
