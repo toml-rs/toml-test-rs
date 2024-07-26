@@ -90,7 +90,7 @@ where
                         match decoder.verify_invalid_case(case.fixture) {
                             Ok(err) => {
                                 if nocapture {
-                                    let _ = writeln!(std::io::stdout(), "{}", err);
+                                    let _ = writeln!(std::io::stdout(), "{err}");
                                 }
                                 Ok(())
                             }

@@ -8,8 +8,7 @@ pub trait Encoder {
         let actual = self.encode(decoded_expected.clone())?;
         let decoded_actual = fixture.decode(actual.as_bytes()).map_err(|err| {
             crate::Error::new(format!(
-                "Could not parse encoded TOML: {}\n```\n{}\n```",
-                err, actual
+                "Could not parse encoded TOML: {err}\n```\n{actual}\n```"
             ))
         })?;
 

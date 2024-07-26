@@ -2,10 +2,10 @@
 name = "toml-test-harness"
 version = "0.4.10"
 description = "Cargo test harness for verifying TOML parsers"
-repository = "https://github.com/epage/toml-test-rs"
 readme = "README.md"
 categories = ["development-tools::testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
+repository.workspace = true
 license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
