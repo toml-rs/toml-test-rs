@@ -5,6 +5,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
+repository = "https://github.com/epage/toml-test-rs"
 license = "MIT OR Apache-2.0"
 edition = "2021"
 rust-version = "1.65"  # MSRV
@@ -20,7 +21,7 @@ include = [
 ]
 
 [workspace.lints.rust]
-rust_2018_idioms = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
 unreachable_pub = "warn"
 unsafe_op_in_unsafe_fn = "warn"
 unused_lifetimes = "warn"
@@ -54,7 +55,6 @@ inconsistent_struct_constructor = "warn"
 inefficient_to_string = "warn"
 infinite_loop = "warn"
 invalid_upcast_comparisons = "warn"
-items_after_statements = "warn"
 large_digit_groups = "warn"
 large_stack_arrays = "warn"
 large_types_passed_by_value = "warn"
@@ -62,7 +62,6 @@ let_and_return = "allow"  # sometimes good to name what you are returning
 linkedlist = "warn"
 lossy_float_literal = "warn"
 macro_use_imports = "warn"
-match_wildcard_for_single_variants = "warn"
 mem_forget = "warn"
 mutex_integer = "warn"
 needless_continue = "warn"
@@ -77,7 +76,6 @@ rest_pat_in_fully_bound_structs = "warn"
 same_functions_in_if_condition = "warn"
 self_named_module_files = "warn"
 semicolon_if_nothing_returned = "warn"
-single_match_else = "warn"
 str_to_string = "warn"
 string_add = "warn"
 string_add_assign = "warn"
@@ -85,6 +83,7 @@ string_lit_as_bytes = "warn"
 string_to_string = "warn"
 todo = "warn"
 trait_duplication_in_bounds = "warn"
+uninlined_format_args = "warn"
 verbose_file_reads = "warn"
 wildcard_imports = "warn"
 zero_sized_map_values = "warn"
@@ -93,11 +92,11 @@ zero_sized_map_values = "warn"
 name = "toml-test"
 version = "1.0.2"
 description = "Verify Rust TOML parsers"
-repository = "https://github.com/epage/toml-test-rs"
 documentation = "http://docs.rs/toml-test"
 readme = "README.md"
 categories = ["development-tools::testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
+repository.workspace = true
 license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
