@@ -8,7 +8,7 @@ const TESTS_DIR: include_dir::Dir<'_> =
 
 pub fn version(ver: &str) -> impl Iterator<Item = &'static std::path::Path> {
     TESTS_DIR
-        .get_file(&format!("files-toml-{ver}"))
+        .get_file(format!("files-toml-{ver}"))
         .and_then(|f| std::str::from_utf8(f.contents()).ok())
         .into_iter()
         .flat_map(|f| f.lines())
