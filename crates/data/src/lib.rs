@@ -3,6 +3,10 @@
 #![warn(clippy::print_stdout)]
 #![allow(clippy::self_named_module_files)] // `include_dir!`?
 
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;
+
 const TESTS_DIR: include_dir::Dir<'_> =
     include_dir::include_dir!("$CARGO_MANIFEST_DIR/assets/toml-test/tests");
 

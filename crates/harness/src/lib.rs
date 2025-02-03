@@ -2,6 +2,10 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;
+
 use std::io::Write;
 
 pub use toml_test::decoded::Decoded;
