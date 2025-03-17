@@ -1,6 +1,6 @@
 [package]
 name = "toml-test-harness"
-version = "0.4.10"
+version = "0.4.11"
 description = "Cargo test harness for verifying TOML parsers"
 readme = "README.md"
 categories = ["development-tools::testing", "text-processing", "encoding"]
