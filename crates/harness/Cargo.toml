@@ -1,6 +1,6 @@
 [package]
 name = "toml-test-harness"
-version = "0.4.12"
+version = "0.4.13"
 description = "Cargo test harness for verifying TOML parsers"
 readme = "README.md"
 categories = ["development-tools::testing", "text-processing", "encoding"]
@@ -17,7 +17,7 @@ rustdoc-args = ["--cfg", "docsrs", "--generate-link-to-definition"]
 
 [dependencies]
 toml-test-data = { version = "1.14.0", path = "../data" }
-toml-test = { version = "^1.0.3", path = "../../" }
+toml-test = { version = "^1.0.4", path = "../../" }
 ignore = "0.4.18"
 libtest-mimic = "0.7.0"
 
