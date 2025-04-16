@@ -123,7 +123,7 @@ chrono = { version = "0.4.22", default-features = false, features = ["std"] }
 ryu = "1.0.15"
 
 [dev-dependencies]
-toml-test-data = { version = "1.14.0", path = "crates/data" }
+toml-test-data = { version = "1.15.0", path = "crates/data" }
 
 [lints]
 workspace = true
