@@ -3,13 +3,13 @@ use std::io::Write;
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
-pub enum Decoded {
+pub enum DecodedValue {
     Scalar(DecodedScalar),
-    Table(std::collections::HashMap<String, Decoded>),
-    Array(Vec<Decoded>),
+    Table(std::collections::HashMap<String, DecodedValue>),
+    Array(Vec<DecodedValue>),
 }
 
-impl Decoded {
+impl DecodedValue {
     pub fn from_slice(v: &[u8]) -> Result<Self, crate::Error> {
         serde_json::from_slice(v).map_err(|e| {
             crate::Error::new(format!(
