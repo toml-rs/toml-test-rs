@@ -18,6 +18,8 @@ pub struct DecoderHarness<D> {
     decoder: D,
     matches: Option<Matches>,
     version: Option<String>,
+    custom_valid: Vec<toml_test_data::Valid<'static>>,
+    custom_invalid: Vec<toml_test_data::Invalid<'static>>,
     #[cfg(feature = "snapshot")]
     snapshot_root: Option<std::path::PathBuf>,
 }
@@ -31,6 +33,8 @@ where
             decoder,
             matches: None,
             version: None,
+            custom_valid: Vec::new(),
+            custom_invalid: Vec::new(),
             #[cfg(feature = "snapshot")]
             snapshot_root: None,
         }
@@ -46,6 +50,22 @@ where
 
     pub fn version(&mut self, version: impl Into<String>) -> &mut Self {
         self.version = Some(version.into());
+        self
+    }
+
+    pub fn extend_valid(
+        &mut self,
+        cases: impl IntoIterator<Item = toml_test_data::Valid<'static>>,
+    ) -> &mut Self {
+        self.custom_valid.extend(cases);
+        self
+    }
+
+    pub fn extend_invalid(
+        &mut self,
+        cases: impl IntoIterator<Item = toml_test_data::Invalid<'static>>,
+    ) -> &mut Self {
+        self.custom_invalid.extend(cases);
         self
     }
 
@@ -72,6 +92,7 @@ where
         let snapshot_root = self.snapshot_root;
         tests.extend(
             toml_test_data::valid()
+                .chain(self.custom_valid)
                 .map(|case| {
                     let ignore = self
                         .matches
@@ -92,6 +113,7 @@ where
         );
         tests.extend(
             toml_test_data::invalid()
+                .chain(self.custom_invalid)
                 .map(|case| {
                     let ignore = self
                         .matches
@@ -137,6 +159,7 @@ pub struct EncoderHarness<E, D> {
     fixture: D,
     matches: Option<Matches>,
     version: Option<String>,
+    custom_valid: Vec<toml_test_data::Valid<'static>>,
 }
 
 impl<E, D> EncoderHarness<E, D>
@@ -150,6 +173,7 @@ where
             fixture,
             matches: None,
             version: None,
+            custom_valid: Vec::new(),
         }
     }
 
@@ -163,6 +187,14 @@ where
 
     pub fn version(&mut self, version: impl Into<String>) -> &mut Self {
         self.version = Some(version.into());
+        self
+    }
+
+    pub fn extend_valid(
+        &mut self,
+        cases: impl IntoIterator<Item = toml_test_data::Valid<'static>>,
+    ) -> &mut Self {
+        self.custom_valid.extend(cases);
         self
     }
 
@@ -181,6 +213,7 @@ where
         let fixture = self.fixture;
         tests.extend(
             toml_test_data::valid()
+                .chain(self.custom_valid)
                 .map(|case| {
                     let ignore = self
                         .matches
