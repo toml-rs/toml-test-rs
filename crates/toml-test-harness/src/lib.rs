@@ -8,10 +8,10 @@ pub struct ReadmeDoctests;
 
 use std::io::Write;
 
-pub use toml_test::decoded::DecodedScalar;
-pub use toml_test::decoded::DecodedValue;
-pub use toml_test::verify::Decoder;
-pub use toml_test::verify::Encoder;
+pub use toml_test::DecodedScalar;
+pub use toml_test::DecodedValue;
+pub use toml_test::Decoder;
+pub use toml_test::Encoder;
 pub use toml_test::Error;
 
 pub struct DecoderHarness<D> {

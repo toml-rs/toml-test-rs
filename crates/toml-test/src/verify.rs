@@ -56,6 +56,7 @@ pub trait Decoder {
     fn name(&self) -> &str;
 }
 
+/// TOML parser-as-a-binary
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Command {
     bin: std::path::PathBuf,
