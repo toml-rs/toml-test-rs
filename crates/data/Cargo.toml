@@ -1,6 +1,6 @@
 [package]
 name = "toml-test-data"
-version = "1.15.0"
+version = "1.16.0"
 description = "TOML test cases"
 readme = "README.md"
 categories = ["development-tools::testing", "text-processing", "encoding"]
