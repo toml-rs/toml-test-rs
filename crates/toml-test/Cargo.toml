@@ -32,7 +32,7 @@ chrono = { version = "0.4.40", default-features = false, features = ["std"] }
 ryu = "1.0.20"
 
 [dev-dependencies]
-toml-test-data = { version = "2.0.0", path = "../toml-test-data" }
+toml-test-data = { version = "2.1.0", path = "../toml-test-data" }
 
 [lints]
 workspace = true
