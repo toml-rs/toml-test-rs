@@ -18,6 +18,8 @@ pub struct DecoderHarness<D> {
     decoder: D,
     matches: Option<Matches>,
     version: Option<String>,
+    #[cfg(feature = "snapshot")]
+    snapshot_root: Option<std::path::PathBuf>,
 }
 
 impl<D> DecoderHarness<D>
@@ -29,6 +31,8 @@ where
             decoder,
             matches: None,
             version: None,
+            #[cfg(feature = "snapshot")]
+            snapshot_root: None,
         }
     }
 
@@ -45,6 +49,12 @@ where
         self
     }
 
+    #[cfg(feature = "snapshot")]
+    pub fn snapshot_root(&mut self, root: impl Into<std::path::PathBuf>) -> &mut Self {
+        self.snapshot_root = Some(root.into());
+        self
+    }
+
     pub fn test(self) -> ! {
         let args = libtest_mimic::Arguments::from_args();
         let nocapture = args.nocapture;
@@ -58,6 +68,8 @@ where
 
         let mut tests = Vec::new();
         let decoder = self.decoder;
+        #[cfg(feature = "snapshot")]
+        let snapshot_root = self.snapshot_root;
         tests.extend(
             toml_test_data::valid()
                 .map(|case| {
@@ -90,11 +102,22 @@ where
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
+                    #[cfg(feature = "snapshot")]
+                    let snapshot_root = snapshot_root.clone();
                     libtest_mimic::Trial::test(case.name.display().to_string(), move || {
                         match decoder.verify_invalid_case(case.fixture) {
                             Ok(err) => {
                                 if nocapture {
                                     let _ = writeln!(std::io::stdout(), "{err}");
+                                }
+                                #[cfg(feature = "snapshot")]
+                                if let Some(snapshot_root) = snapshot_root.as_deref() {
+                                    let snapshot_path =
+                                        snapshot_root.join(case.name.with_extension("stderr"));
+                                    snapbox::assert_data_eq!(
+                                        err.to_string(),
+                                        snapbox::Data::read_from(&snapshot_path, None).raw()
+                                    );
                                 }
                                 Ok(())
                             }
