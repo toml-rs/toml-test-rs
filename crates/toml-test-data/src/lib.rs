@@ -7,6 +7,8 @@
 #[cfg(doctest)]
 pub struct ReadmeDoctests;
 
+use std::borrow::Cow;
+
 const TESTS_DIR: include_dir::Dir<'_> =
     include_dir::include_dir!("$CARGO_MANIFEST_DIR/assets/toml-test/tests");
 
@@ -35,11 +37,33 @@ pub fn versions() -> std::collections::HashMap<&'static str, Vec<&'static std::p
         .collect()
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Valid<'a> {
-    pub name: &'a std::path::Path,
-    pub fixture: &'a [u8],
-    pub expected: &'a [u8],
+    pub name: Cow<'a, std::path::Path>,
+    pub fixture: Cow<'a, [u8]>,
+    pub expected: Cow<'a, [u8]>,
+}
+
+impl<'a> Valid<'a> {
+    pub fn borrow<'b: 'a>(&'b self) -> Valid<'b> {
+        Self {
+            name: Cow::Borrowed(self.name()),
+            fixture: Cow::Borrowed(self.fixture()),
+            expected: Cow::Borrowed(self.expected()),
+        }
+    }
+
+    pub fn name(&self) -> &std::path::Path {
+        self.name.as_ref()
+    }
+
+    pub fn fixture(&self) -> &[u8] {
+        self.fixture.as_ref()
+    }
+
+    pub fn expected(&self) -> &[u8] {
+        self.expected.as_ref()
+    }
 }
 
 pub fn valid() -> impl Iterator<Item = Valid<'static>> {
@@ -65,9 +89,9 @@ fn valid_files<'d>(
                         && f.path().extension().unwrap() == "json"
                 })
                 .unwrap();
-            let name = t.path();
-            let fixture = t.contents();
-            let expected = j.contents();
+            let name = Cow::Borrowed(t.path());
+            let fixture = Cow::Borrowed(t.contents());
+            let expected = Cow::Borrowed(j.contents());
             Valid {
                 name,
                 fixture,
@@ -76,10 +100,27 @@ fn valid_files<'d>(
         })
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invalid<'a> {
-    pub name: &'a std::path::Path,
-    pub fixture: &'a [u8],
+    pub name: Cow<'a, std::path::Path>,
+    pub fixture: Cow<'a, [u8]>,
+}
+
+impl<'a> Invalid<'a> {
+    pub fn borrow<'b: 'a>(&'b self) -> Invalid<'b> {
+        Self {
+            name: Cow::Borrowed(self.name()),
+            fixture: Cow::Borrowed(self.fixture()),
+        }
+    }
+
+    pub fn name(&self) -> &std::path::Path {
+        self.name.as_ref()
+    }
+
+    pub fn fixture(&self) -> &[u8] {
+        self.fixture.as_ref()
+    }
 }
 
 pub fn invalid() -> impl Iterator<Item = Invalid<'static>> {
@@ -89,8 +130,8 @@ pub fn invalid() -> impl Iterator<Item = Invalid<'static>> {
         assert_eq!(d.dirs().count(), 0);
         d.files().map(|f| {
             let t = f;
-            let name = f.path();
-            let fixture = t.contents();
+            let name = Cow::Borrowed(f.path());
+            let fixture = Cow::Borrowed(t.contents());
             Invalid { name, fixture }
         })
     })

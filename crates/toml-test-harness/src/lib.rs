@@ -18,6 +18,8 @@ pub struct DecoderHarness<D> {
     decoder: D,
     matches: Option<Matches>,
     version: Option<String>,
+    custom_valid: Vec<toml_test_data::Valid<'static>>,
+    custom_invalid: Vec<toml_test_data::Invalid<'static>>,
     #[cfg(feature = "snapshot")]
     snapshot_root: Option<std::path::PathBuf>,
 }
@@ -31,6 +33,8 @@ where
             decoder,
             matches: None,
             version: None,
+            custom_valid: Vec::new(),
+            custom_invalid: Vec::new(),
             #[cfg(feature = "snapshot")]
             snapshot_root: None,
         }
@@ -46,6 +50,22 @@ where
 
     pub fn version(&mut self, version: impl Into<String>) -> &mut Self {
         self.version = Some(version.into());
+        self
+    }
+
+    pub fn extend_valid(
+        &mut self,
+        cases: impl IntoIterator<Item = toml_test_data::Valid<'static>>,
+    ) -> &mut Self {
+        self.custom_valid.extend(cases);
+        self
+    }
+
+    pub fn extend_invalid(
+        &mut self,
+        cases: impl IntoIterator<Item = toml_test_data::Invalid<'static>>,
+    ) -> &mut Self {
+        self.custom_invalid.extend(cases);
         self
     }
 
@@ -72,19 +92,20 @@ where
         let snapshot_root = self.snapshot_root;
         tests.extend(
             toml_test_data::valid()
+                .chain(self.custom_valid)
                 .map(|case| {
                     let ignore = self
                         .matches
                         .as_ref()
-                        .map(|m| !m.matched(case.name))
+                        .map(|m| !m.matched(case.name()))
                         .unwrap_or_default()
-                        || !versioned.contains(case.name);
+                        || !versioned.contains(case.name());
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
-                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
+                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
                         decoder
-                            .verify_valid_case(case.fixture, case.expected)
+                            .verify_valid_case(case.fixture(), case.expected())
                             .map_err(libtest_mimic::Failed::from)
                     })
                     .with_ignored_flag(ignore)
@@ -92,20 +113,21 @@ where
         );
         tests.extend(
             toml_test_data::invalid()
+                .chain(self.custom_invalid)
                 .map(|case| {
                     let ignore = self
                         .matches
                         .as_ref()
-                        .map(|m| !m.matched(case.name))
+                        .map(|m| !m.matched(case.name()))
                         .unwrap_or_default()
-                        || !versioned.contains(case.name);
+                        || !versioned.contains(case.name());
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
                     #[cfg(feature = "snapshot")]
                     let snapshot_root = snapshot_root.clone();
-                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
-                        match decoder.verify_invalid_case(case.fixture) {
+                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
+                        match decoder.verify_invalid_case(case.fixture()) {
                             Ok(err) => {
                                 if nocapture {
                                     let _ = writeln!(std::io::stdout(), "{err}");
@@ -113,7 +135,7 @@ where
                                 #[cfg(feature = "snapshot")]
                                 if let Some(snapshot_root) = snapshot_root.as_deref() {
                                     let snapshot_path =
-                                        snapshot_root.join(case.name.with_extension("stderr"));
+                                        snapshot_root.join(case.name().with_extension("stderr"));
                                     snapbox::assert_data_eq!(
                                         err.to_string(),
                                         snapbox::Data::read_from(&snapshot_path, None).raw()
@@ -137,6 +159,7 @@ pub struct EncoderHarness<E, D> {
     fixture: D,
     matches: Option<Matches>,
     version: Option<String>,
+    custom_valid: Vec<toml_test_data::Valid<'static>>,
 }
 
 impl<E, D> EncoderHarness<E, D>
@@ -150,6 +173,7 @@ where
             fixture,
             matches: None,
             version: None,
+            custom_valid: Vec::new(),
         }
     }
 
@@ -163,6 +187,14 @@ where
 
     pub fn version(&mut self, version: impl Into<String>) -> &mut Self {
         self.version = Some(version.into());
+        self
+    }
+
+    pub fn extend_valid(
+        &mut self,
+        cases: impl IntoIterator<Item = toml_test_data::Valid<'static>>,
+    ) -> &mut Self {
+        self.custom_valid.extend(cases);
         self
     }
 
@@ -181,19 +213,20 @@ where
         let fixture = self.fixture;
         tests.extend(
             toml_test_data::valid()
+                .chain(self.custom_valid)
                 .map(|case| {
                     let ignore = self
                         .matches
                         .as_ref()
-                        .map(|m| !m.matched(case.name))
+                        .map(|m| !m.matched(case.name()))
                         .unwrap_or_default()
-                        || !versioned.contains(case.name);
+                        || !versioned.contains(case.name());
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
-                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
+                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
                         encoder
-                            .verify_valid_case(case.expected, &fixture)
+                            .verify_valid_case(case.expected(), &fixture)
                             .map_err(libtest_mimic::Failed::from)
                     })
                     .with_ignored_flag(ignore)
