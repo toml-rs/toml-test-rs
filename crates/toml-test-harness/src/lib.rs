@@ -76,15 +76,15 @@ where
                     let ignore = self
                         .matches
                         .as_ref()
-                        .map(|m| !m.matched(case.name))
+                        .map(|m| !m.matched(case.name()))
                         .unwrap_or_default()
-                        || !versioned.contains(case.name);
+                        || !versioned.contains(case.name());
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
-                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
+                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
                         decoder
-                            .verify_valid_case(case.fixture, case.expected)
+                            .verify_valid_case(case.fixture(), case.expected())
                             .map_err(libtest_mimic::Failed::from)
                     })
                     .with_ignored_flag(ignore)
@@ -96,16 +96,16 @@ where
                     let ignore = self
                         .matches
                         .as_ref()
-                        .map(|m| !m.matched(case.name))
+                        .map(|m| !m.matched(case.name()))
                         .unwrap_or_default()
-                        || !versioned.contains(case.name);
+                        || !versioned.contains(case.name());
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
                     #[cfg(feature = "snapshot")]
                     let snapshot_root = snapshot_root.clone();
-                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
-                        match decoder.verify_invalid_case(case.fixture) {
+                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
+                        match decoder.verify_invalid_case(case.fixture()) {
                             Ok(err) => {
                                 if nocapture {
                                     let _ = writeln!(std::io::stdout(), "{err}");
@@ -113,7 +113,7 @@ where
                                 #[cfg(feature = "snapshot")]
                                 if let Some(snapshot_root) = snapshot_root.as_deref() {
                                     let snapshot_path =
-                                        snapshot_root.join(case.name.with_extension("stderr"));
+                                        snapshot_root.join(case.name().with_extension("stderr"));
                                     snapbox::assert_data_eq!(
                                         err.to_string(),
                                         snapbox::Data::read_from(&snapshot_path, None).raw()
@@ -185,15 +185,15 @@ where
                     let ignore = self
                         .matches
                         .as_ref()
-                        .map(|m| !m.matched(case.name))
+                        .map(|m| !m.matched(case.name()))
                         .unwrap_or_default()
-                        || !versioned.contains(case.name);
+                        || !versioned.contains(case.name());
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
-                    libtest_mimic::Trial::test(case.name.display().to_string(), move || {
+                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
                         encoder
-                            .verify_valid_case(case.expected, &fixture)
+                            .verify_valid_case(case.expected(), &fixture)
                             .map_err(libtest_mimic::Failed::from)
                     })
                     .with_ignored_flag(ignore)
