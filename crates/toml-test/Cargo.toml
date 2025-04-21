@@ -1,6 +1,6 @@
 [package]
 name = "toml-test"
-version = "1.0.4"
+version = "2.0.0"
 description = "Verify Rust TOML parsers"
 documentation = "http://docs.rs/toml-test"
 readme = "README.md"

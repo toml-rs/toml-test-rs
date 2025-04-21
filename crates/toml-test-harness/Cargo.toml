@@ -20,7 +20,7 @@ snapshot = ["dep:snapbox"]
 
 [dependencies]
 toml-test-data = { version = "2.0.0", path = "../toml-test-data" }
-toml-test = { version = "^1.0.4", path = "../toml-test" }
+toml-test = { version = "^2.0.0", path = "../toml-test" }
 ignore = "0.4.20"
 libtest-mimic = "0.7.0"
 snapbox = { version = "0.6.21", optional = true }
