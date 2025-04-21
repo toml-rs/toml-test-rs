@@ -9,7 +9,7 @@ pub struct ReadmeDoctests;
 use std::io::Write;
 
 pub use toml_test::decoded::Decoded;
-pub use toml_test::decoded::DecodedValue;
+pub use toml_test::decoded::DecodedScalar;
 pub use toml_test::verify::Decoder;
 pub use toml_test::verify::Encoder;
 pub use toml_test::Error;

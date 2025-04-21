@@ -4,7 +4,7 @@ use std::io::Write;
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum Decoded {
-    Value(DecodedValue),
+    Scalar(DecodedScalar),
     Table(std::collections::HashMap<String, Decoded>),
     Array(Vec<Decoded>),
 }
@@ -45,7 +45,7 @@ impl Decoded {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 #[serde(tag = "type", content = "value")]
-pub enum DecodedValue {
+pub enum DecodedScalar {
     String(String),
     Integer(String),
     Float(String),
@@ -56,46 +56,46 @@ pub enum DecodedValue {
     TimeLocal(String),
 }
 
-impl DecodedValue {
+impl DecodedScalar {
     pub fn as_str(&self) -> &str {
         match self {
-            DecodedValue::String(v)
-            | DecodedValue::Integer(v)
-            | DecodedValue::Float(v)
-            | DecodedValue::Bool(v)
-            | DecodedValue::Datetime(v)
-            | DecodedValue::DatetimeLocal(v)
-            | DecodedValue::DateLocal(v)
-            | DecodedValue::TimeLocal(v) => v.as_str(),
+            DecodedScalar::String(v)
+            | DecodedScalar::Integer(v)
+            | DecodedScalar::Float(v)
+            | DecodedScalar::Bool(v)
+            | DecodedScalar::Datetime(v)
+            | DecodedScalar::DatetimeLocal(v)
+            | DecodedScalar::DateLocal(v)
+            | DecodedScalar::TimeLocal(v) => v.as_str(),
         }
     }
 }
 
-impl<'a> From<&'a str> for DecodedValue {
+impl<'a> From<&'a str> for DecodedScalar {
     fn from(other: &'a str) -> Self {
-        DecodedValue::String(other.to_owned())
+        DecodedScalar::String(other.to_owned())
     }
 }
 
-impl<'a> From<&'a String> for DecodedValue {
+impl<'a> From<&'a String> for DecodedScalar {
     fn from(other: &'a String) -> Self {
-        DecodedValue::String(other.clone())
+        DecodedScalar::String(other.clone())
     }
 }
 
-impl From<String> for DecodedValue {
+impl From<String> for DecodedScalar {
     fn from(other: String) -> Self {
-        DecodedValue::String(other)
+        DecodedScalar::String(other)
     }
 }
 
-impl From<i64> for DecodedValue {
+impl From<i64> for DecodedScalar {
     fn from(other: i64) -> Self {
-        DecodedValue::Integer(other.to_string())
+        DecodedScalar::Integer(other.to_string())
     }
 }
 
-impl From<f64> for DecodedValue {
+impl From<f64> for DecodedScalar {
     fn from(other: f64) -> Self {
         let s = if other.is_nan() {
             "nan".to_owned()
@@ -108,23 +108,23 @@ impl From<f64> for DecodedValue {
             let printed = buffer.format(other);
             printed.to_owned()
         };
-        DecodedValue::Float(s)
+        DecodedScalar::Float(s)
     }
 }
 
-impl From<bool> for DecodedValue {
+impl From<bool> for DecodedScalar {
     fn from(other: bool) -> Self {
-        DecodedValue::Bool(other.to_string())
+        DecodedScalar::Bool(other.to_string())
     }
 }
 
-impl PartialEq for DecodedValue {
+impl PartialEq for DecodedScalar {
     fn eq(&self, other: &Self) -> bool {
         #[allow(clippy::if_same_then_else)]
         match (self, other) {
-            (DecodedValue::String(s), DecodedValue::String(o)) => s == o,
-            (DecodedValue::Integer(s), DecodedValue::Integer(o)) => s == o,
-            (DecodedValue::Float(s), DecodedValue::Float(o)) => {
+            (DecodedScalar::String(s), DecodedScalar::String(o)) => s == o,
+            (DecodedScalar::Integer(s), DecodedScalar::Integer(o)) => s == o,
+            (DecodedScalar::Float(s), DecodedScalar::Float(o)) => {
                 if s == "inf" && o == "+inf" {
                     true
                 } else if s == "+inf" && o == "inf" {
@@ -137,17 +137,17 @@ impl PartialEq for DecodedValue {
                     s == o
                 }
             }
-            (DecodedValue::Bool(s), DecodedValue::Bool(o)) => s == o,
-            (DecodedValue::Datetime(s), DecodedValue::Datetime(o)) => {
+            (DecodedScalar::Bool(s), DecodedScalar::Bool(o)) => s == o,
+            (DecodedScalar::Datetime(s), DecodedScalar::Datetime(o)) => {
                 parse_date_time(s) == parse_date_time(o)
             }
-            (DecodedValue::DatetimeLocal(s), DecodedValue::DatetimeLocal(o)) => {
+            (DecodedScalar::DatetimeLocal(s), DecodedScalar::DatetimeLocal(o)) => {
                 parse_date_time_local(s) == parse_date_time_local(o)
             }
-            (DecodedValue::DateLocal(s), DecodedValue::DateLocal(o)) => {
+            (DecodedScalar::DateLocal(s), DecodedScalar::DateLocal(o)) => {
                 parse_date_local(s) == parse_date_local(o)
             }
-            (DecodedValue::TimeLocal(s), DecodedValue::TimeLocal(o)) => {
+            (DecodedScalar::TimeLocal(s), DecodedScalar::TimeLocal(o)) => {
                 parse_time_local(s) == parse_time_local(o)
             }
             (_, _) => false,
@@ -194,7 +194,7 @@ fn normalize_datetime(s: &str) -> String {
         .collect()
 }
 
-impl Eq for DecodedValue {}
+impl Eq for DecodedScalar {}
 
 #[cfg(test)]
 mod test {
@@ -202,63 +202,66 @@ mod test {
 
     #[test]
     fn string_equality() {
-        assert_eq!(DecodedValue::from("foo"), DecodedValue::from("foo"));
-        assert_ne!(DecodedValue::from("foo"), DecodedValue::from("bar"));
-        assert_ne!(DecodedValue::from("42"), DecodedValue::from(42));
-        assert_ne!(DecodedValue::from("true"), DecodedValue::from(true));
+        assert_eq!(DecodedScalar::from("foo"), DecodedScalar::from("foo"));
+        assert_ne!(DecodedScalar::from("foo"), DecodedScalar::from("bar"));
+        assert_ne!(DecodedScalar::from("42"), DecodedScalar::from(42));
+        assert_ne!(DecodedScalar::from("true"), DecodedScalar::from(true));
     }
 
     #[test]
     fn integer_equality() {
-        assert_eq!(DecodedValue::from(42), DecodedValue::from(42));
-        assert_ne!(DecodedValue::from(42), DecodedValue::from(21));
-        assert_ne!(DecodedValue::from(42), DecodedValue::from("42"));
+        assert_eq!(DecodedScalar::from(42), DecodedScalar::from(42));
+        assert_ne!(DecodedScalar::from(42), DecodedScalar::from(21));
+        assert_ne!(DecodedScalar::from(42), DecodedScalar::from("42"));
     }
 
     #[test]
     fn float_equality() {
-        assert_eq!(DecodedValue::from(42.0), DecodedValue::from(42.0));
-        assert_ne!(DecodedValue::from(42.0), DecodedValue::from(21.0));
-        assert_ne!(DecodedValue::from(42.0), DecodedValue::from("42.0"));
+        assert_eq!(DecodedScalar::from(42.0), DecodedScalar::from(42.0));
+        assert_ne!(DecodedScalar::from(42.0), DecodedScalar::from(21.0));
+        assert_ne!(DecodedScalar::from(42.0), DecodedScalar::from("42.0"));
     }
 
     #[test]
     fn nan_equality() {
-        assert_eq!(DecodedValue::from(f64::NAN), DecodedValue::from(f64::NAN));
+        assert_eq!(DecodedScalar::from(f64::NAN), DecodedScalar::from(f64::NAN));
         assert_eq!(
-            DecodedValue::from(f64::NAN),
-            DecodedValue::Float("nan".to_owned())
+            DecodedScalar::from(f64::NAN),
+            DecodedScalar::Float("nan".to_owned())
         );
-        assert_ne!(DecodedValue::from(f64::NAN), DecodedValue::from("nan"));
+        assert_ne!(DecodedScalar::from(f64::NAN), DecodedScalar::from("nan"));
     }
 
     #[test]
     fn inf_equality() {
         assert_eq!(
-            DecodedValue::from(f64::INFINITY),
-            DecodedValue::from(f64::INFINITY)
+            DecodedScalar::from(f64::INFINITY),
+            DecodedScalar::from(f64::INFINITY)
         );
         assert_ne!(
-            DecodedValue::from(f64::INFINITY),
-            DecodedValue::from(f64::NEG_INFINITY)
+            DecodedScalar::from(f64::INFINITY),
+            DecodedScalar::from(f64::NEG_INFINITY)
         );
         assert_eq!(
-            DecodedValue::from(f64::INFINITY),
-            DecodedValue::Float("inf".to_owned())
+            DecodedScalar::from(f64::INFINITY),
+            DecodedScalar::Float("inf".to_owned())
         );
         assert_eq!(
-            DecodedValue::from(f64::INFINITY),
-            DecodedValue::Float("+inf".to_owned())
+            DecodedScalar::from(f64::INFINITY),
+            DecodedScalar::Float("+inf".to_owned())
         );
-        assert_ne!(DecodedValue::from(f64::INFINITY), DecodedValue::from("inf"));
+        assert_ne!(
+            DecodedScalar::from(f64::INFINITY),
+            DecodedScalar::from("inf")
+        );
     }
 
     #[test]
     fn float_exp_equality() {
-        assert_eq!(DecodedValue::from(3.0e14), DecodedValue::from(3.0e14));
+        assert_eq!(DecodedScalar::from(3.0e14), DecodedScalar::from(3.0e14));
         assert_eq!(
-            DecodedValue::from(3.0e14),
-            DecodedValue::Float("3.0e14".to_owned())
+            DecodedScalar::from(3.0e14),
+            DecodedScalar::Float("3.0e14".to_owned())
         );
     }
 
@@ -269,123 +272,123 @@ mod test {
         // These cases are equivalent, just wanting to call out how Rust, at times, encodes the
         // number in a string.
         assert_eq!(
-            DecodedValue::from(3141.5927),
-            DecodedValue::Float("3141.5927".to_owned())
+            DecodedScalar::from(3141.5927),
+            DecodedScalar::Float("3141.5927".to_owned())
         );
         assert_eq!(
-            DecodedValue::from(3141.59270000000015),
-            DecodedValue::Float("3141.5927".to_owned())
+            DecodedScalar::from(3141.59270000000015),
+            DecodedScalar::Float("3141.5927".to_owned())
         );
     }
 
     #[test]
     fn neg_inf_equality() {
         assert_eq!(
-            DecodedValue::from(f64::NEG_INFINITY),
-            DecodedValue::from(f64::NEG_INFINITY)
+            DecodedScalar::from(f64::NEG_INFINITY),
+            DecodedScalar::from(f64::NEG_INFINITY)
         );
         assert_ne!(
-            DecodedValue::from(f64::NEG_INFINITY),
-            DecodedValue::from(f64::INFINITY)
+            DecodedScalar::from(f64::NEG_INFINITY),
+            DecodedScalar::from(f64::INFINITY)
         );
         assert_eq!(
-            DecodedValue::from(f64::NEG_INFINITY),
-            DecodedValue::Float("-inf".to_owned())
+            DecodedScalar::from(f64::NEG_INFINITY),
+            DecodedScalar::Float("-inf".to_owned())
         );
         assert_ne!(
-            DecodedValue::from(f64::NEG_INFINITY),
-            DecodedValue::from("-inf")
+            DecodedScalar::from(f64::NEG_INFINITY),
+            DecodedScalar::from("-inf")
         );
     }
 
     #[test]
     fn bool_equality() {
-        assert_eq!(DecodedValue::from(true), DecodedValue::from(true));
-        assert_ne!(DecodedValue::from(true), DecodedValue::from(false));
-        assert_ne!(DecodedValue::from(true), DecodedValue::from("true"));
+        assert_eq!(DecodedScalar::from(true), DecodedScalar::from(true));
+        assert_ne!(DecodedScalar::from(true), DecodedScalar::from(false));
+        assert_ne!(DecodedScalar::from(true), DecodedScalar::from("true"));
     }
 
     #[test]
     fn datetime_equality() {
         assert_eq!(
-            DecodedValue::Datetime("1987-07-05 17:45:00Z".to_owned()),
-            DecodedValue::Datetime("1987-07-05 17:45:00Z".to_owned())
+            DecodedScalar::Datetime("1987-07-05 17:45:00Z".to_owned()),
+            DecodedScalar::Datetime("1987-07-05 17:45:00Z".to_owned())
         );
         assert_eq!(
-            DecodedValue::Datetime("1987-07-05T17:45:56.123456Z".to_owned()),
-            DecodedValue::Datetime("1987-07-05T17:45:56.123456Z".to_owned()),
+            DecodedScalar::Datetime("1987-07-05T17:45:56.123456Z".to_owned()),
+            DecodedScalar::Datetime("1987-07-05T17:45:56.123456Z".to_owned()),
         );
         assert_ne!(
-            DecodedValue::Datetime("1987-07-05 17:45:00Z".to_owned()),
-            DecodedValue::Datetime("2000-07-05 17:45:00Z".to_owned())
+            DecodedScalar::Datetime("1987-07-05 17:45:00Z".to_owned()),
+            DecodedScalar::Datetime("2000-07-05 17:45:00Z".to_owned())
         );
         assert_eq!(
-            DecodedValue::Datetime("1987-07-05t17:45:00z".to_owned()),
-            DecodedValue::Datetime("1987-07-05 17:45:00Z".to_owned())
+            DecodedScalar::Datetime("1987-07-05t17:45:00z".to_owned()),
+            DecodedScalar::Datetime("1987-07-05 17:45:00Z".to_owned())
         );
         assert_ne!(
-            DecodedValue::Datetime("1987-07-05 17:45:00Z".to_owned()),
-            DecodedValue::from("1987-07-05 17:45:00Z")
+            DecodedScalar::Datetime("1987-07-05 17:45:00Z".to_owned()),
+            DecodedScalar::from("1987-07-05 17:45:00Z")
         );
     }
 
     #[test]
     fn datetime_local_equality() {
         assert_eq!(
-            DecodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
-            DecodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned())
+            DecodedScalar::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
+            DecodedScalar::DatetimeLocal("1987-07-05 17:45:00".to_owned())
         );
         assert_eq!(
-            DecodedValue::DatetimeLocal("1987-07-05 17:45:00.444".to_owned()),
-            DecodedValue::DatetimeLocal("1987-07-05 17:45:00.444".to_owned())
+            DecodedScalar::DatetimeLocal("1987-07-05 17:45:00.444".to_owned()),
+            DecodedScalar::DatetimeLocal("1987-07-05 17:45:00.444".to_owned())
         );
         assert_ne!(
-            DecodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
-            DecodedValue::DatetimeLocal("2000-07-05 17:45:00".to_owned())
+            DecodedScalar::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
+            DecodedScalar::DatetimeLocal("2000-07-05 17:45:00".to_owned())
         );
         assert_eq!(
-            DecodedValue::DatetimeLocal("1987-07-05t17:45:00".to_owned()),
-            DecodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned())
+            DecodedScalar::DatetimeLocal("1987-07-05t17:45:00".to_owned()),
+            DecodedScalar::DatetimeLocal("1987-07-05 17:45:00".to_owned())
         );
         assert_ne!(
-            DecodedValue::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
-            DecodedValue::from("1987-07-05 17:45:00")
+            DecodedScalar::DatetimeLocal("1987-07-05 17:45:00".to_owned()),
+            DecodedScalar::from("1987-07-05 17:45:00")
         );
     }
 
     #[test]
     fn date_local_equality() {
         assert_eq!(
-            DecodedValue::DateLocal("1987-07-05".to_owned()),
-            DecodedValue::DateLocal("1987-07-05".to_owned())
+            DecodedScalar::DateLocal("1987-07-05".to_owned()),
+            DecodedScalar::DateLocal("1987-07-05".to_owned())
         );
         assert_ne!(
-            DecodedValue::DateLocal("1987-07-05".to_owned()),
-            DecodedValue::DateLocal("2000-07-05".to_owned())
+            DecodedScalar::DateLocal("1987-07-05".to_owned()),
+            DecodedScalar::DateLocal("2000-07-05".to_owned())
         );
         assert_ne!(
-            DecodedValue::DateLocal("1987-07-05".to_owned()),
-            DecodedValue::from("1987-07-05")
+            DecodedScalar::DateLocal("1987-07-05".to_owned()),
+            DecodedScalar::from("1987-07-05")
         );
     }
 
     #[test]
     fn time_local_equality() {
         assert_eq!(
-            DecodedValue::TimeLocal("17:45:00".to_owned()),
-            DecodedValue::TimeLocal("17:45:00".to_owned())
+            DecodedScalar::TimeLocal("17:45:00".to_owned()),
+            DecodedScalar::TimeLocal("17:45:00".to_owned())
         );
         assert_eq!(
-            DecodedValue::TimeLocal("17:45:00.444".to_owned()),
-            DecodedValue::TimeLocal("17:45:00.444".to_owned())
+            DecodedScalar::TimeLocal("17:45:00.444".to_owned()),
+            DecodedScalar::TimeLocal("17:45:00.444".to_owned())
         );
         assert_ne!(
-            DecodedValue::TimeLocal("17:45:00".to_owned()),
-            DecodedValue::TimeLocal("19:45:00".to_owned())
+            DecodedScalar::TimeLocal("17:45:00".to_owned()),
+            DecodedScalar::TimeLocal("19:45:00".to_owned())
         );
         assert_ne!(
-            DecodedValue::TimeLocal("17:45:00".to_owned()),
-            DecodedValue::from("17:45:00")
+            DecodedScalar::TimeLocal("17:45:00".to_owned()),
+            DecodedScalar::from("17:45:00")
         );
     }
 }
