@@ -92,14 +92,17 @@ where
         let snapshot_root = self.snapshot_root;
         tests.extend(
             toml_test_data::valid()
-                .chain(self.custom_valid)
                 .map(|case| {
-                    let ignore = self
+                    let ignore = !versioned.contains(case.name());
+                    (case, ignore)
+                })
+                .chain(self.custom_valid.into_iter().map(|c| (c, false)))
+                .map(|(case, mut ignore)| {
+                    ignore |= self
                         .matches
                         .as_ref()
                         .map(|m| !m.matched(case.name()))
-                        .unwrap_or_default()
-                        || !versioned.contains(case.name());
+                        .unwrap_or_default();
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
@@ -113,14 +116,17 @@ where
         );
         tests.extend(
             toml_test_data::invalid()
-                .chain(self.custom_invalid)
                 .map(|case| {
-                    let ignore = self
+                    let ignore = !versioned.contains(case.name());
+                    (case, ignore)
+                })
+                .chain(self.custom_invalid.into_iter().map(|c| (c, false)))
+                .map(|(case, mut ignore)| {
+                    ignore |= self
                         .matches
                         .as_ref()
                         .map(|m| !m.matched(case.name()))
-                        .unwrap_or_default()
-                        || !versioned.contains(case.name());
+                        .unwrap_or_default();
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
@@ -213,14 +219,17 @@ where
         let fixture = self.fixture;
         tests.extend(
             toml_test_data::valid()
-                .chain(self.custom_valid)
                 .map(|case| {
-                    let ignore = self
+                    let ignore = !versioned.contains(case.name());
+                    (case, ignore)
+                })
+                .chain(self.custom_valid.into_iter().map(|c| (c, false)))
+                .map(|(case, mut ignore)| {
+                    ignore |= self
                         .matches
                         .as_ref()
                         .map(|m| !m.matched(case.name()))
-                        .unwrap_or_default()
-                        || !versioned.contains(case.name());
+                        .unwrap_or_default();
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
