@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Compatibility
+
+- Renamed `Decoded` to `DecodedValue`
+- Renamed `Decoded::Value` to `DecodedValue::Scalar`
+- Renamed `DecodedValue` to `DecodedScalar`
+- Moved all types into crate root
+
 ## [1.0.4] - 2025-04-14
 
 ## [1.0.3] - 2025-03-17
