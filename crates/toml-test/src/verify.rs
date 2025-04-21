@@ -1,10 +1,10 @@
 use std::io::Write;
 
 pub trait Encoder {
-    fn encode(&self, data: crate::decoded::Decoded) -> Result<String, crate::Error>;
+    fn encode(&self, data: crate::decoded::DecodedValue) -> Result<String, crate::Error>;
 
     fn verify_valid_case(&self, decoded: &[u8], fixture: &dyn Decoder) -> Result<(), crate::Error> {
-        let decoded_expected = crate::decoded::Decoded::from_slice(decoded)?;
+        let decoded_expected = crate::decoded::DecodedValue::from_slice(decoded)?;
         let actual = self.encode(decoded_expected.clone())?;
         let decoded_actual = fixture.decode(actual.as_bytes()).map_err(|err| {
             crate::Error::new(format!(
@@ -27,11 +27,11 @@ pub trait Encoder {
 }
 
 pub trait Decoder {
-    fn decode(&self, data: &[u8]) -> Result<crate::decoded::Decoded, crate::Error>;
+    fn decode(&self, data: &[u8]) -> Result<crate::decoded::DecodedValue, crate::Error>;
 
     fn verify_valid_case(&self, fixture: &[u8], expected: &[u8]) -> Result<(), crate::Error> {
         let actual = self.decode(fixture)?;
-        let expected = crate::decoded::Decoded::from_slice(expected)?;
+        let expected = crate::decoded::DecodedValue::from_slice(expected)?;
         if actual == expected {
             Ok(())
         } else {
@@ -56,6 +56,7 @@ pub trait Decoder {
     fn name(&self) -> &str;
 }
 
+/// TOML parser-as-a-binary
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Command {
     bin: std::path::PathBuf,
@@ -70,7 +71,7 @@ impl Command {
 }
 
 impl Encoder for Command {
-    fn encode(&self, data: crate::decoded::Decoded) -> Result<String, crate::Error> {
+    fn encode(&self, data: crate::decoded::DecodedValue) -> Result<String, crate::Error> {
         let data = data.to_string_pretty()?;
 
         let mut cmd = std::process::Command::new(&self.bin);
@@ -106,7 +107,7 @@ impl Encoder for Command {
 }
 
 impl Decoder for Command {
-    fn decode(&self, data: &[u8]) -> Result<crate::decoded::Decoded, crate::Error> {
+    fn decode(&self, data: &[u8]) -> Result<crate::decoded::DecodedValue, crate::Error> {
         let mut cmd = std::process::Command::new(&self.bin);
         cmd.stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
@@ -121,8 +122,8 @@ impl Decoder for Command {
 
         let output = child.wait_with_output().map_err(crate::Error::new)?;
         if output.status.success() {
-            let output =
-                crate::decoded::Decoded::from_slice(&output.stdout).map_err(crate::Error::new)?;
+            let output = crate::decoded::DecodedValue::from_slice(&output.stdout)
+                .map_err(crate::Error::new)?;
             Ok(output)
         } else {
             let message = String::from_utf8_lossy(&output.stderr);
