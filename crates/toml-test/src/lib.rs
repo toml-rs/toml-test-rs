@@ -1,4 +1,4 @@
-//! > DESCRIPTION
+//! Verify Rust TOML parsers
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(clippy::print_stderr)]
