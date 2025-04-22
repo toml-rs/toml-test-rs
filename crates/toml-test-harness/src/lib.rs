@@ -166,6 +166,8 @@ pub struct EncoderHarness<E, D> {
     matches: Option<Matches>,
     version: Option<String>,
     custom_valid: Vec<toml_test_data::Valid<'static>>,
+    #[cfg(feature = "snapshot")]
+    snapshot_root: Option<std::path::PathBuf>,
 }
 
 impl<E, D> EncoderHarness<E, D>
@@ -180,6 +182,8 @@ where
             matches: None,
             version: None,
             custom_valid: Vec::new(),
+            #[cfg(feature = "snapshot")]
+            snapshot_root: None,
         }
     }
 
@@ -201,6 +205,12 @@ where
         cases: impl IntoIterator<Item = toml_test_data::Valid<'static>>,
     ) -> &mut Self {
         self.custom_valid.extend(cases);
+        self
+    }
+
+    #[cfg(feature = "snapshot")]
+    pub fn snapshot_root(&mut self, root: impl Into<std::path::PathBuf>) -> &mut Self {
+        self.snapshot_root = Some(root.into());
         self
     }
 
@@ -235,7 +245,17 @@ where
                 .map(move |(case, ignore)| {
                     libtest_mimic::Trial::test(case.name().display().to_string(), move || {
                         match encoder.verify_valid_case(case.expected(), &fixture) {
-                            Ok(_) => Ok(()),
+                            Ok(_encoded) => {
+                                #[cfg(feature = "snapshot")]
+                                if let Some(snapshot_root) = snapshot_root.as_deref() {
+                                    let snapshot_path = snapshot_root.join(case.name());
+                                    snapbox::assert_data_eq!(
+                                        _encoded,
+                                        snapbox::Data::read_from(&snapshot_path, None).raw()
+                                    );
+                                }
+                                Ok(())
+                            }
                             Err(err) => Err(libtest_mimic::Failed::from(err)),
                         }
                     })
