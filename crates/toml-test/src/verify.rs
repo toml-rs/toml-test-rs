@@ -3,7 +3,11 @@ use std::io::Write;
 pub trait Encoder {
     fn encode(&self, data: crate::decoded::DecodedValue) -> Result<String, crate::Error>;
 
-    fn verify_valid_case(&self, decoded: &[u8], fixture: &dyn Decoder) -> Result<(), crate::Error> {
+    fn verify_valid_case(
+        &self,
+        decoded: &[u8],
+        fixture: &dyn Decoder,
+    ) -> Result<String, crate::Error> {
         let decoded_expected = crate::decoded::DecodedValue::from_slice(decoded)?;
         let actual = self.encode(decoded_expected.clone())?;
         let decoded_actual = fixture.decode(actual.as_bytes()).map_err(|err| {
@@ -13,7 +17,7 @@ pub trait Encoder {
         })?;
 
         if decoded_actual == decoded_expected {
-            Ok(())
+            Ok(actual)
         } else {
             Err(crate::Error::new(format!(
                 "Unexpected decoding.\nExpected\n{}\nActual\n{}",

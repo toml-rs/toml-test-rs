@@ -234,9 +234,10 @@ where
                 })
                 .map(move |(case, ignore)| {
                     libtest_mimic::Trial::test(case.name().display().to_string(), move || {
-                        encoder
-                            .verify_valid_case(case.expected(), &fixture)
-                            .map_err(libtest_mimic::Failed::from)
+                        match encoder.verify_valid_case(case.expected(), &fixture) {
+                            Ok(_) => Ok(()),
+                            Err(err) => Err(libtest_mimic::Failed::from(err)),
+                        }
                     })
                     .with_ignored_flag(ignore)
                 }),
