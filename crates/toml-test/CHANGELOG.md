@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.0.1] - 2025-04-28
+
 ## [2.0.0] - 2025-04-21
 
 ### Compatibility
@@ -89,7 +91,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2021-08-16
 
 <!-- next-url -->
-[Unreleased]: https://github.com/epage/git-stack/compare/toml-test-v2.0.0...HEAD
+[Unreleased]: https://github.com/epage/git-stack/compare/toml-test-v2.0.1...HEAD
+[2.0.1]: https://github.com/epage/git-stack/compare/toml-test-v2.0.0...toml-test-v2.0.1
 [2.0.0]: https://github.com/epage/git-stack/compare/v1.0.4...toml-test-v2.0.0
 [1.0.4]: https://github.com/epage/git-stack/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/epage/git-stack/compare/v1.0.2...v1.0.3
