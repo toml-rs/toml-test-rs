@@ -1,5 +1,6 @@
 use std::io::Write;
 
+/// Abstract over your TOML serialization
 pub trait Encoder {
     fn encode(&self, data: crate::decoded::DecodedValue) -> Result<String, crate::Error>;
 
@@ -26,6 +27,7 @@ pub trait Encoder {
     fn name(&self) -> &str;
 }
 
+/// Abstract over your TOML deserialization
 pub trait Decoder {
     fn decode(&self, data: &[u8]) -> Result<crate::decoded::DecodedValue, crate::Error>;
 

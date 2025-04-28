@@ -1,3 +1,9 @@
+//! Test cases from the [toml-test](https://github.com/toml-lang/toml-test) conformance suite
+//!
+//! To read and write these test cases, see [`toml-test`](https://docs.rs/toml-test).
+//!
+//! To run the test cases against your TOML implementation, see [`toml-test-harness`](https://docs.rs/toml-test-harness).
+
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
@@ -12,6 +18,7 @@ use std::borrow::Cow;
 const TESTS_DIR: include_dir::Dir<'_> =
     include_dir::include_dir!("$CARGO_MANIFEST_DIR/assets/toml-test/tests");
 
+/// Get the test cases for a given spec version
 pub fn version(ver: &str) -> impl Iterator<Item = &'static std::path::Path> {
     TESTS_DIR
         .get_file(format!("files-toml-{ver}"))
@@ -21,6 +28,7 @@ pub fn version(ver: &str) -> impl Iterator<Item = &'static std::path::Path> {
         .map(std::path::Path::new)
 }
 
+/// Get all supported spec versions and their test cases
 pub fn versions() -> std::collections::HashMap<&'static str, Vec<&'static std::path::Path>> {
     TESTS_DIR
         .files()
@@ -37,6 +45,7 @@ pub fn versions() -> std::collections::HashMap<&'static str, Vec<&'static std::p
         .collect()
 }
 
+/// Valid TOML test case
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Valid<'a> {
     pub name: Cow<'a, std::path::Path>,
@@ -66,6 +75,7 @@ impl<'a> Valid<'a> {
     }
 }
 
+/// Returns all [`Valid`] TOML test cases
 pub fn valid() -> impl Iterator<Item = Valid<'static>> {
     let valid_dir = TESTS_DIR.get_dir("valid").unwrap();
     valid_files(valid_dir).chain(valid_dir.dirs().flat_map(|d| {
@@ -100,6 +110,7 @@ fn valid_files<'d>(
         })
 }
 
+/// Invalid TOML test case
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invalid<'a> {
     pub name: Cow<'a, std::path::Path>,
@@ -123,6 +134,7 @@ impl<'a> Invalid<'a> {
     }
 }
 
+/// Returns all [`Invalid`] TOML test cases
 pub fn invalid() -> impl Iterator<Item = Invalid<'static>> {
     let invalid_dir = TESTS_DIR.get_dir("invalid").unwrap();
     assert_eq!(invalid_dir.files().count(), 0);
