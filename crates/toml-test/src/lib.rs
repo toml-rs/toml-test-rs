@@ -1,4 +1,8 @@
 //! Verify Rust TOML parsers
+//!
+//! For TOML test cases, see [`toml-test-data`](https://docs.rs/toml-test-data).
+//!
+//! To run the test cases against your TOML implementation, see [`toml-test-harness`](https://docs.rs/toml-test-harness).
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(clippy::print_stderr)]

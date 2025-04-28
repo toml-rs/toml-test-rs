@@ -1,3 +1,11 @@
+//! Verify Rust TOML parsers
+//!
+//! See [`DecoderHarness`] and [`EncoderHarness`]
+//!
+//! For TOML test cases, see [`toml-test-data`](https://docs.rs/toml-test-data).
+//!
+//! To read and write these test cases, see [`toml-test`](https://docs.rs/toml-test).
+
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
@@ -14,6 +22,37 @@ pub use toml_test::Decoder;
 pub use toml_test::Encoder;
 pub use toml_test::Error;
 
+/// Run decoder compliance tests
+///
+/// # Example
+///
+/// In `Cargo.toml`:
+/// ```toml
+/// [[test]]
+/// name = "decoder_compliance"
+/// harness = false
+/// ```
+///
+/// `tests/decoder_compliance.rs`
+/// ```rust,no_run
+/// // mod decoder;
+/// # mod decoder {
+/// #   #[derive(Copy, Clone)]
+/// #   pub struct Decoder;
+/// #   impl toml_test_harness::Decoder for Decoder {
+/// #     fn name(&self) -> &'static str { "foo" }
+/// #     fn decode(&self, _: &[u8]) -> Result<toml_test_harness::DecodedValue, toml_test_harness::Error> { todo!() }
+/// #   }
+/// # }
+///
+/// fn main() {
+///     let decoder = decoder::Decoder;
+///     let mut harness = toml_test_harness::DecoderHarness::new(decoder);
+///     harness.version("1.0.0");
+///     harness.ignore([]).unwrap();
+///     harness.test();
+/// }
+/// ```
 pub struct DecoderHarness<D> {
     decoder: D,
     matches: Option<Matches>,
@@ -160,6 +199,52 @@ where
     }
 }
 
+/// Run encoder compliance tests
+///
+/// <div class="warning">
+///
+/// [`DecoderHarness`] must pass on your [`Decoder`] fixture for this to work
+///
+/// </div>
+///
+/// # Example
+///
+/// In `Cargo.toml`:
+/// ```toml
+/// [[test]]
+/// name = "encoder_compliance"
+/// harness = false
+/// ```
+///
+/// `tests/encoder_compliance.rs`
+/// ```rust,no_run
+/// // mod decoder;
+/// // mod encoder;
+/// # mod decoder {
+/// #   #[derive(Copy, Clone)]
+/// #   pub struct Decoder;
+/// #   impl toml_test_harness::Decoder for Decoder {
+/// #     fn name(&self) -> &'static str { "foo" }
+/// #     fn decode(&self, _: &[u8]) -> Result<toml_test_harness::DecodedValue, toml_test_harness::Error> { todo!() }
+/// #   }
+/// # }
+/// # mod encoder {
+/// #   #[derive(Copy, Clone)]
+/// #   pub struct Encoder;
+/// #   impl toml_test_harness::Encoder for Encoder {
+/// #     fn name(&self) -> &'static str { "foo" }
+/// #     fn encode(&self, _: toml_test_harness::DecodedValue) -> Result<String, toml_test_harness::Error> { todo!() }
+/// #   }
+/// # }
+///
+/// fn main() {
+///     let encoder = encoder::Encoder;
+///     let decoder = decoder::Decoder;
+///     let mut harness = toml_test_harness::EncoderHarness::new(encoder, decoder);
+///     harness.version("1.0.0");
+///     harness.test();
+/// }
+/// ```
 pub struct EncoderHarness<E, D> {
     encoder: E,
     fixture: D,
