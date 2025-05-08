@@ -17,7 +17,8 @@ pub trait Encoder {
             Ok(())
         } else {
             Err(crate::Error::new(format!(
-                "Unexpected decoding.\nExpected\n{}\nActual\n{}",
+                "Unexpected decoding\n```toml\n{}\n```\nExpected\n{}\nActual\n{}",
+                actual,
                 decoded_expected.to_string_pretty().unwrap(),
                 decoded_actual.to_string_pretty().unwrap()
             )))
@@ -38,7 +39,8 @@ pub trait Decoder {
             Ok(())
         } else {
             Err(crate::Error::new(format!(
-                "Unexpected decoding.\nExpected\n{}\nActual\n{}",
+                "Unexpected decoding\n```toml\n{}\n```\nExpected\n{}\nActual\n{}",
+                std::str::from_utf8(fixture).unwrap(),
                 expected.to_string_pretty().unwrap(),
                 actual.to_string_pretty().unwrap()
             )))
@@ -48,8 +50,9 @@ pub trait Decoder {
     fn verify_invalid_case(&self, fixture: &[u8]) -> Result<crate::Error, crate::Error> {
         match self.decode(fixture) {
             Ok(value) => Err(crate::Error::new(format!(
-                "Should have failed but got:\n{}",
-                value.to_string_pretty().unwrap()
+                "Should have failed but got:\n{}\n```toml\n{}\n```",
+                value.to_string_pretty().unwrap(),
+                std::str::from_utf8(fixture).unwrap(),
             ))),
             Err(err) => Ok(err),
         }
