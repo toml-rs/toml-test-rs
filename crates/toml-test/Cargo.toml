@@ -2,8 +2,6 @@
 name = "toml-test"
 version = "2.0.2"
 description = "Verify Rust TOML parsers"
-documentation = "http://docs.rs/toml-test"
-readme = "README.md"
 categories = ["development-tools::testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
 repository.workspace = true

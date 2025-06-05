@@ -9,10 +9,6 @@
 #![warn(clippy::print_stdout)]
 #![allow(clippy::self_named_module_files)] // `include_dir!`?
 
-#[doc = include_str!("../README.md")]
-#[cfg(doctest)]
-pub struct ReadmeDoctests;
-
 use std::borrow::Cow;
 
 const TESTS_DIR: include_dir::Dir<'_> =
@@ -148,3 +144,7 @@ pub fn invalid() -> impl Iterator<Item = Invalid<'static>> {
         })
     })
 }
+
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;
