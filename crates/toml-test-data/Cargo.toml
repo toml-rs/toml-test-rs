@@ -2,7 +2,6 @@
 name = "toml-test-data"
 version = "2.3.2"
 description = "TOML test cases"
-readme = "README.md"
 categories = ["development-tools::testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
 repository.workspace = true
@@ -16,7 +15,6 @@ include = [
   "Cargo.lock",
   "LICENSE*",
   "README.md",
-  "benches/**/*",
   "examples/**/*",
   "assets/**/*",
 ]
