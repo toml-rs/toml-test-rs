@@ -1,6 +1,6 @@
 [package]
 name = "toml-test-harness"
-version = "1.3.2"
+version = "1.3.3"
 description = "Cargo test harness for verifying TOML parsers"
 categories = ["development-tools::testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
@@ -18,8 +18,8 @@ rustdoc-args = ["--generate-link-to-definition"]
 snapshot = ["dep:snapbox"]
 
 [dependencies]
-toml-test-data = { version = "2.3.2", path = "../toml-test-data" }
-toml-test = { version = "^2.0.2", path = "../toml-test" }
+toml-test-data = { version = "2.3.3", path = "../toml-test-data" }
+toml-test = { version = "^2.0.3", path = "../toml-test" }
 ignore = "0.4.20"
 libtest2-mimic = "0.0.4"
 snapbox = { version = "0.6.21", optional = true }
