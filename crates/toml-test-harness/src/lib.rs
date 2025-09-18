@@ -10,8 +10,6 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-use std::io::Write;
-
 pub use toml_test::DecodedScalar;
 pub use toml_test::DecodedValue;
 pub use toml_test::Decoder;
@@ -111,8 +109,7 @@ where
     }
 
     pub fn test(self) -> ! {
-        let args = libtest_mimic::Arguments::from_args();
-        let nocapture = args.nocapture;
+        let harness = libtest2_mimic::Harness::with_env();
 
         let versioned = self
             .version
@@ -141,12 +138,14 @@ where
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
-                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
+                    libtest2_mimic::Trial::test(case.name().display().to_string(), move |context| {
+                        if ignore {
+                            context.ignore()?;
+                        }
                         decoder
                             .verify_valid_case(case.fixture(), case.expected())
-                            .map_err(libtest_mimic::Failed::from)
+                            .map_err(libtest2_mimic::RunError::fail)
                     })
-                    .with_ignored_flag(ignore)
                 }),
         );
         tests.extend(
@@ -167,31 +166,29 @@ where
                 .map(move |(case, ignore)| {
                     #[cfg(feature = "snapshot")]
                     let snapshot_root = snapshot_root.clone();
-                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
+                    libtest2_mimic::Trial::test(case.name().display().to_string(), move |context| {
+                        if ignore {
+                            context.ignore()?;
+                        }
                         match decoder.verify_invalid_case(case.fixture()) {
-                            Ok(err) => {
-                                if nocapture {
-                                    let _ = writeln!(std::io::stdout(), "{err}");
-                                }
+                            Ok(_err) => {
                                 #[cfg(feature = "snapshot")]
                                 if let Some(snapshot_root) = snapshot_root.as_deref() {
                                     let snapshot_path =
                                         snapshot_root.join(case.name().with_extension("stderr"));
                                     snapbox::assert_data_eq!(
-                                        err.to_string(),
+                                        _err.to_string(),
                                         snapbox::Data::read_from(&snapshot_path, None).raw()
                                     );
                                 }
                                 Ok(())
                             }
-                            Err(err) => Err(libtest_mimic::Failed::from(err)),
+                            Err(err) => Err(libtest2_mimic::RunError::fail(err)),
                         }
                     })
-                    .with_ignored_flag(ignore)
                 }),
         );
-
-        libtest_mimic::run(&args, tests).exit()
+        harness.discover(tests).main()
     }
 }
 
@@ -286,7 +283,7 @@ where
     }
 
     pub fn test(self) -> ! {
-        let args = libtest_mimic::Arguments::from_args();
+        let harness = libtest2_mimic::Harness::with_env();
 
         let versioned = self
             .version
@@ -314,15 +311,17 @@ where
                     (case, ignore)
                 })
                 .map(move |(case, ignore)| {
-                    libtest_mimic::Trial::test(case.name().display().to_string(), move || {
+                    libtest2_mimic::Trial::test(case.name().display().to_string(), move |context| {
+                        if ignore {
+                            context.ignore()?;
+                        }
                         encoder
                             .verify_valid_case(case.expected(), &fixture)
-                            .map_err(libtest_mimic::Failed::from)
+                            .map_err(libtest2_mimic::RunError::fail)
                     })
-                    .with_ignored_flag(ignore)
                 }),
         );
-        libtest_mimic::run(&args, tests).exit()
+        harness.discover(tests).main()
     }
 }
 
