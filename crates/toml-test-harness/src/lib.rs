@@ -6,7 +6,7 @@
 //!
 //! To read and write these test cases, see [`toml-test`](https://docs.rs/toml-test).
 
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
