@@ -1,6 +1,6 @@
 [package]
 name = "toml-test"
-version = "2.0.3"
+version = "2.0.4"
 description = "Verify Rust TOML parsers"
 categories = ["development-tools::testing", "text-processing", "encoding"]
 keywords = ["development", "toml"]
