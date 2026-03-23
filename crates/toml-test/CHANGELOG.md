@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.1.0] - 2026-03-23
+
 ### Compatibility
 
 - Update MSRV to 1.85
@@ -101,7 +103,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [0.2.0] - 2021-08-16
 
 <!-- next-url -->
-[Unreleased]: https://github.com/epage/git-stack/compare/toml-test-v2.0.4...HEAD
+[Unreleased]: https://github.com/epage/git-stack/compare/toml-test-v2.1.0...HEAD
+[2.1.0]: https://github.com/epage/git-stack/compare/toml-test-v2.0.4...toml-test-v2.1.0
 [2.0.4]: https://github.com/epage/git-stack/compare/toml-test-v2.0.3...toml-test-v2.0.4
 [2.0.3]: https://github.com/epage/git-stack/compare/toml-test-v2.0.2...toml-test-v2.0.3
 [2.0.2]: https://github.com/epage/git-stack/compare/toml-test-v2.0.1...toml-test-v2.0.2
