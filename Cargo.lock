@@ -453,14 +453,14 @@ dependencies = [
 
 [[package]]
 name = "toml-test-data"
-version = "2.14.0"
+version = "2.14.1"
 dependencies = [
  "include_dir",
 ]
 
 [[package]]
 name = "toml-test-harness"
-version = "1.14.0"
+version = "1.14.1"
 dependencies = [
  "ignore",
  "libtest2-mimic",
