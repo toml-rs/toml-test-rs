@@ -6,8 +6,8 @@ use std::io::Write;
 #[serde(untagged)]
 pub enum DecodedValue {
     Scalar(DecodedScalar),
-    Table(std::collections::HashMap<String, DecodedValue>),
-    Array(Vec<DecodedValue>),
+    Table(std::collections::HashMap<String, Self>),
+    Array(Vec<Self>),
 }
 
 impl DecodedValue {
@@ -61,39 +61,39 @@ pub enum DecodedScalar {
 impl DecodedScalar {
     pub fn as_str(&self) -> &str {
         match self {
-            DecodedScalar::String(v)
-            | DecodedScalar::Integer(v)
-            | DecodedScalar::Float(v)
-            | DecodedScalar::Bool(v)
-            | DecodedScalar::Datetime(v)
-            | DecodedScalar::DatetimeLocal(v)
-            | DecodedScalar::DateLocal(v)
-            | DecodedScalar::TimeLocal(v) => v.as_str(),
+            Self::String(v)
+            | Self::Integer(v)
+            | Self::Float(v)
+            | Self::Bool(v)
+            | Self::Datetime(v)
+            | Self::DatetimeLocal(v)
+            | Self::DateLocal(v)
+            | Self::TimeLocal(v) => v.as_str(),
         }
     }
 }
 
 impl<'a> From<&'a str> for DecodedScalar {
     fn from(other: &'a str) -> Self {
-        DecodedScalar::String(other.to_owned())
+        Self::String(other.to_owned())
     }
 }
 
 impl<'a> From<&'a String> for DecodedScalar {
     fn from(other: &'a String) -> Self {
-        DecodedScalar::String(other.clone())
+        Self::String(other.clone())
     }
 }
 
 impl From<String> for DecodedScalar {
     fn from(other: String) -> Self {
-        DecodedScalar::String(other)
+        Self::String(other)
     }
 }
 
 impl From<i64> for DecodedScalar {
     fn from(other: i64) -> Self {
-        DecodedScalar::Integer(other.to_string())
+        Self::Integer(other.to_string())
     }
 }
 
@@ -110,13 +110,13 @@ impl From<f64> for DecodedScalar {
             let printed = buffer.format(other);
             printed.to_owned()
         };
-        DecodedScalar::Float(s)
+        Self::Float(s)
     }
 }
 
 impl From<bool> for DecodedScalar {
     fn from(other: bool) -> Self {
-        DecodedScalar::Bool(other.to_string())
+        Self::Bool(other.to_string())
     }
 }
 
@@ -124,9 +124,9 @@ impl PartialEq for DecodedScalar {
     fn eq(&self, other: &Self) -> bool {
         #[allow(clippy::if_same_then_else)]
         match (self, other) {
-            (DecodedScalar::String(s), DecodedScalar::String(o)) => s == o,
-            (DecodedScalar::Integer(s), DecodedScalar::Integer(o)) => s == o,
-            (DecodedScalar::Float(s), DecodedScalar::Float(o)) => {
+            (Self::String(s), Self::String(o)) => s == o,
+            (Self::Integer(s), Self::Integer(o)) => s == o,
+            (Self::Float(s), Self::Float(o)) => {
                 if s == "inf" && o == "+inf" {
                     true
                 } else if s == "+inf" && o == "inf" {
@@ -139,19 +139,13 @@ impl PartialEq for DecodedScalar {
                     s == o
                 }
             }
-            (DecodedScalar::Bool(s), DecodedScalar::Bool(o)) => s == o,
-            (DecodedScalar::Datetime(s), DecodedScalar::Datetime(o)) => {
-                parse_date_time(s) == parse_date_time(o)
-            }
-            (DecodedScalar::DatetimeLocal(s), DecodedScalar::DatetimeLocal(o)) => {
+            (Self::Bool(s), Self::Bool(o)) => s == o,
+            (Self::Datetime(s), Self::Datetime(o)) => parse_date_time(s) == parse_date_time(o),
+            (Self::DatetimeLocal(s), Self::DatetimeLocal(o)) => {
                 parse_date_time_local(s) == parse_date_time_local(o)
             }
-            (DecodedScalar::DateLocal(s), DecodedScalar::DateLocal(o)) => {
-                parse_date_local(s) == parse_date_local(o)
-            }
-            (DecodedScalar::TimeLocal(s), DecodedScalar::TimeLocal(o)) => {
-                parse_time_local(s) == parse_time_local(o)
-            }
+            (Self::DateLocal(s), Self::DateLocal(o)) => parse_date_local(s) == parse_date_local(o),
+            (Self::TimeLocal(s), Self::TimeLocal(o)) => parse_time_local(s) == parse_time_local(o),
             (_, _) => false,
         }
     }
